@@ -2,6 +2,7 @@ package finalProject.fishingLogTracker.fishingTracker.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import finalProject.fishingLogTracker.auth.model.User;
+import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,13 +26,21 @@ public class Catch {
     private Double size;
     private Double weight;
     @ManyToOne
+    @JoinColumn(name = "aquatic_id")
     private Aquatic aquatic;
+    private FishingStyle fishingStyle;
+
 //    private Location location;
 //    private Wheather wheather;
+
     private LocalDateTime time;
-//    private Bait bait;
+    @ManyToOne
+    @JoinColumn(name = "bait_id")
+    private Bait bait;
+
     private String photoUrl;
     private boolean isReleased;
+    private String description;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
