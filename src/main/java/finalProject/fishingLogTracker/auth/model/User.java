@@ -40,10 +40,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-//    @OneToMany(mappedBy = "users")
-//    @JsonManagedReference
-//
-//    private List<Catch> catches = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Catch> catches = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
