@@ -42,7 +42,7 @@ public class Catch {
     private boolean isReleased;
     private String description;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
