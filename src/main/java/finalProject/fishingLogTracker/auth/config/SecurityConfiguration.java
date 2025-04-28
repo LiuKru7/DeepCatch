@@ -37,6 +37,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)  // Disables CSRF protection (common for REST APIs)
                 .authorizeHttpRequests(auth -> auth  // Starts request authorization configuration
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/api/catch/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/carparts/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
