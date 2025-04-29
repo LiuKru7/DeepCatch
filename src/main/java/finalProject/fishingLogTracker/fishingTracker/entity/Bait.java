@@ -18,11 +18,7 @@ public class Bait {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
-
     private BaitType baitType;
-
     private String description;
 
 }
