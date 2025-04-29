@@ -16,7 +16,7 @@ public class Aquatic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-
     @Enumerated(EnumType.STRING)
     private AquaticType aquaticType;
+
 }

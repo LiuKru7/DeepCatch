@@ -39,7 +39,7 @@ public class Catch {
     private Bait bait;
 
     private String photoUrl;
-    private boolean isReleased;
+    private Boolean isReleased;
     private String description;
 
     @ManyToOne
