@@ -1,6 +1,10 @@
 package finalProject.fishingLogTracker.fishingTracker.service;
 
+import finalProject.fishingLogTracker.fishingTracker.dto.CatchRequest;
+import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
 import finalProject.fishingLogTracker.fishingTracker.entity.Catch;
+import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
+import finalProject.fishingLogTracker.fishingTracker.mapper.CatchMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.CatchRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,30 +23,40 @@ import java.util.List;
 public class CatchService {
 
     private final CatchRepository catchRepository;
+    private final CatchMapper catchMapper;
 
-    public Catch addCatch(@Valid Catch catchBody) {
-        log.info("Creating new Catch : {}", catchBody);
-        return catchRepository.save(catchBody);
-    }
+    public CatchResponse addCatch(@Valid CatchRequest catchRequest) {
+        log.info("Creating new Catch : {}", catchRequest);
+        Catch catchEntity = catchMapper.toCatch(catchRequest);
+        Catch savedCatch = catchRepository.save(catchEntity);
+        return catchMapper.toCatchResponse(savedCatch);
+            }
 
-    public Catch getCatchById(Long id) {
+    public CatchResponse getCatchById(Long id) {
         log.info("Fetching Catch with ID: {}", id);
-        return catchRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Catch not found with id: " + id));
+        Catch catchEntity = catchRepository.findById(id)
+                .orElseThrow(() -> new CatchNotFoundException("Catch not found with id: " + id));
+        return catchMapper.toCatchResponse(catchEntity);
     }
 
-    public List<Catch> getAllCatches() {
+    public List<CatchResponse> getAllCatches() {
         log.info("Fetching all Catch entries");
-        return catchRepository.findAll();
+        return catchRepository.findAll()
+                .stream()
+                .map(catchMapper::toCatchResponse)
+                .toList();
     }
 
-    public Catch updateCatch(Long id, @Valid Catch updatedCatch) {
+    public CatchResponse updateCatch(Long id, @Valid CatchRequest catchRequest) {
         log.info("Updating Catch with ID: {}", id);
         Catch existingCatch = catchRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Catch not found with id: " + id));
+                .orElseThrow(() -> new CatchNotFoundException("Catch not found with id: " + id));
 
+        Catch updatedCatch = catchMapper.toCatch(catchRequest);
         updatedCatch.setId(existingCatch.getId());
-        return catchRepository.save(updatedCatch);
+        Catch saved = catchRepository.save(updatedCatch);
+
+        return catchMapper.toCatchResponse(saved);
     }
 
     public void deleteCatch(Long id) {
@@ -50,7 +64,7 @@ public class CatchService {
 
         if (!catchRepository.existsById(id)) {
             log.error("Catch not found with id: {}", id);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Catch not found with id: " + id);
+            throw new CatchNotFoundException("Catch not found with id: " + id);
         }
 
         catchRepository.deleteById(id);
