@@ -30,7 +30,7 @@ public class CatchService {
         Catch catchEntity = catchMapper.toCatch(catchRequest);
         Catch savedCatch = catchRepository.save(catchEntity);
         return catchMapper.toCatchResponse(savedCatch);
-            }
+    }
 
     public CatchResponse getCatchById(Long id) {
         log.info("Fetching Catch with ID: {}", id);

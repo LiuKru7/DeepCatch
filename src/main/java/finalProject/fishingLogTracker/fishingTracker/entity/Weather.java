@@ -10,18 +10,19 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Location {
+@AllArgsConstructor
+public class Weather {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double latitude;
-    private Double longitude;
-    private String country;
-    private String region;
-
-
+    private Double temperature;
+    private Double feelsLike;
+    private Double humidity;
+    private String condition;
+    private Double windSpeed;
+    private Integer windDirection;
+    private Integer pressure;
 }

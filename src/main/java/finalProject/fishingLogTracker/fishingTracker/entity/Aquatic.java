@@ -1,10 +1,14 @@
 package finalProject.fishingLogTracker.fishingTracker.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,5 +22,9 @@ public class Aquatic {
     private String name;
     @Enumerated(EnumType.STRING)
     private AquaticType aquaticType;
+
+    @OneToMany(mappedBy = "aquatic")
+    @JsonBackReference
+    private List<Catch> catches = new ArrayList<>();
 
 }
