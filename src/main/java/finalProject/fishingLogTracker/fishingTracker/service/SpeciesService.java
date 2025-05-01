@@ -19,10 +19,9 @@ public class SpeciesService {
     private final SpeciesMapper speciesMapper;
 
     public List<SpeciesResponse> getAllSpecies() {
-        return  speciesRepository.findAll().stream()
+        return speciesRepository.findAll().stream()
                 .map(speciesMapper::toSpeciesResponse)
                 .toList();
-
     }
 
     public SpeciesResponse addNewSpecies(SpeciesRequest speciesRequest) {

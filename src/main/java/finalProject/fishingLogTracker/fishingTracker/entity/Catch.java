@@ -1,6 +1,7 @@
 package finalProject.fishingLogTracker.fishingTracker.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 import jakarta.persistence.*;
@@ -25,17 +26,24 @@ public class Catch {
     private Species species;
     private Double size;
     private Double weight;
+
     @ManyToOne
     @JoinColumn(name = "aquatic_id")
+    @JsonManagedReference
     private Aquatic aquatic;
+
     private FishingStyle fishingStyle;
 
+//    @ManyToOne(cascade = CascadeType.ALL)
 //    private Location location;
-//    private Wheather wheather;
+//    @ManyToOne(cascade = CascadeType.ALL)
+//    private Weather weather;
 
     private LocalDateTime time;
+
     @ManyToOne
     @JoinColumn(name = "bait_id")
+    @JsonManagedReference
     private Bait bait;
 
     private String photoUrl;
