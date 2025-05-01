@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,7 @@ public class CatchController {
     private final CatchService catchService;
 
     @PostMapping
-    public ResponseEntity<CatchResponse> addCatch(@RequestBody @Valid CatchRequest catchRequest) {
+    public ResponseEntity<CatchResponse> addCatch(@RequestBody @Valid CatchRequest catchRequest) throws IOException {
         log.info("Received request to create Catch");
         CatchResponse newCatch = catchService.addCatch(catchRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCatch);
@@ -41,7 +42,9 @@ public class CatchController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CatchResponse> updateCatch(@PathVariable Long id, @Valid @RequestBody CatchRequest catchRequest) {
+    public ResponseEntity<CatchResponse> updateCatch(
+            @PathVariable Long id,
+            @Valid @RequestBody CatchRequest catchRequest) {
         log.info("Received request to update Catch ID: {}", id);
         return ResponseEntity.ok(catchService.updateCatch(id, catchRequest));
     }
