@@ -13,7 +13,14 @@ public interface CatchMapper {
     @Mapping(target = "aquaticId", source = "aquatic.id")
     @Mapping(target = "baitId", source = "bait.id")
     @Mapping(target = "userId", source = "user.id")
+
+    @Mapping(target = "latitude", source = "location.latitude")
+    @Mapping(target = "longitude", source = "location.longitude")
+    @Mapping(target = "country", source = "location.country")
+    @Mapping(target = "region", source = "location.region")
     CatchResponse toCatchResponse(Catch catchEntity);
 
-    Catch toCatch (CatchRequest catchRequest);
+    @Mapping(target = "location", ignore = true)
+    @Mapping(target = "weather", ignore = true)
+    Catch toCatch(CatchRequest catchRequest);
 }

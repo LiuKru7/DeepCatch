@@ -34,10 +34,10 @@ public class Catch {
 
     private FishingStyle fishingStyle;
 
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    private Location location;
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    private Weather weather;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Location location;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Weather weather;
 
     private LocalDateTime time;
 

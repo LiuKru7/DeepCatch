@@ -15,6 +15,10 @@ public record CatchRequest(
         String photoUrl,
         Boolean isReleased,
         String description,
-        Long userId
-        ){
+        Long userId,
+        Double latitude,
+        Double longitude,
+        String country,
+        String region
+) {
 }
