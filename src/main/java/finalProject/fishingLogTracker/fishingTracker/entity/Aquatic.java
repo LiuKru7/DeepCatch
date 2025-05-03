@@ -27,4 +27,9 @@ public class Aquatic {
     @JsonBackReference
     private List<Catch> catches = new ArrayList<>();
 
+
+    public Aquatic(String name, AquaticType aquaticType) {
+        this.name = name;
+        this.aquaticType = aquaticType;
+    }
 }

@@ -1,5 +1,6 @@
 package finalProject.fishingLogTracker.fishingTracker.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 
 import java.time.LocalDateTime;

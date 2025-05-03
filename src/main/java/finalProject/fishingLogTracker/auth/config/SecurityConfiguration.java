@@ -39,7 +39,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/**").permitAll()
 //                        .requestMatchers("/api/catch/**").permitAll()
 //                        .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
 //                        .requestMatchers("/api/carparts/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
 //                        .requestMatchers("/api/carparts/admin/**").hasAnyAuthority("ROLE_ADMIN")
 //                        .requestMatchers("/api/supplier/admin/**").hasAnyAuthority("ROLE_ADMIN")

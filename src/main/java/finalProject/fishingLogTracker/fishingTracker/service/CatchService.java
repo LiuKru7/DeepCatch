@@ -1,15 +1,15 @@
 package finalProject.fishingLogTracker.fishingTracker.service;
 
+import finalProject.fishingLogTracker.auth.model.User;
+import finalProject.fishingLogTracker.auth.repository.UserRepository;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
-import finalProject.fishingLogTracker.fishingTracker.entity.Catch;
-import finalProject.fishingLogTracker.fishingTracker.entity.Location;
-import finalProject.fishingLogTracker.fishingTracker.entity.Weather;
+import finalProject.fishingLogTracker.fishingTracker.entity.*;
+import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
 import finalProject.fishingLogTracker.fishingTracker.mapper.CatchMapper;
-import finalProject.fishingLogTracker.fishingTracker.repository.CatchRepository;
-import finalProject.fishingLogTracker.fishingTracker.repository.LocationRepository;
-import finalProject.fishingLogTracker.fishingTracker.repository.WeatherRepository;
+import finalProject.fishingLogTracker.fishingTracker.repository.*;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +30,36 @@ public class CatchService {
     private final LocationRepository locationRepository;
     private final WeatherService weatherService;
     private final WeatherRepository weatherRepository;
+    private final UserRepository userRepository;
+    private final SpeciesRepository speciesRepository;
+    private final BaitRepository baitRepository;
+    private final AquaticRepository aquaticRepository;
 
 
     public CatchResponse addCatch(CatchRequest catchRequest) throws IOException {
         log.info("Creating new Catch : {}", catchRequest);
         Catch catchEntity = catchMapper.toCatch(catchRequest);
 
+
+        var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
+                .orElseThrow(()-> new EntityNotFoundException("Aquatic not found"));
+
+        Bait bait = baitRepository.findById(catchRequest.baitId())
+                .orElseThrow(()-> new EntityNotFoundException("Bait not found"));
+        Species species = speciesRepository.findById(catchRequest.speciesId())
+                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
+        User user = userRepository.findById(catchRequest.userId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
         Location savedLocation = getLocation(catchRequest);
         Weather savedWeather = getWeatherForLocation(savedLocation);
 
-        catchEntity.setLocation(savedLocation);
+        catchEntity.setSpecies(species);
+        catchEntity.setUser(user);
+        catchEntity.setBait(bait);
+        catchEntity.setLocation(savedLocation);;
         catchEntity.setWeather(savedWeather);
+        catchEntity.setAquatic(aquatic);
 
         Catch savedCatch = catchRepository.save(catchEntity);
         return catchMapper.toCatchResponse(savedCatch);
@@ -51,11 +70,11 @@ public class CatchService {
         return weatherRepository.save(weather);
     }
 
-    private Location getLocation(CatchRequest catchRequest) {
-        Double latitude = catchRequest.latitude() != null ? catchRequest.latitude() : 55.3328;
-        Double longitude = catchRequest.longitude() != null ? catchRequest.longitude() : 26.0606;
-        String country = catchRequest.country() != null ? catchRequest.country() : "Lithuania";
-        String region = catchRequest.region() != null ? catchRequest.region() : "Lazdijų Rajonas";
+    private Location getLocation(final CatchRequest catchRequest) {
+        final Double latitude = catchRequest.latitude() != null ? catchRequest.latitude() : 55.3328;
+        final Double longitude = catchRequest.longitude() != null ? catchRequest.longitude() : 26.0606;
+        final String country = catchRequest.country() != null ? catchRequest.country() : "Lithuania";
+        final String region = catchRequest.region() != null ? catchRequest.region() : "Lazdijų Rajonas";
 
         Location location = new Location(null, latitude, longitude, country, region);
         return locationRepository.save(location);
@@ -96,5 +115,12 @@ public class CatchService {
         }
 
         catchRepository.deleteById(id);
+    }
+
+    public List<CatchResponse> getCatchesByFishingStyle(final FishingStyle style) {
+        var catches = catchRepository.findByFishingStyle(style);
+        return catches.stream()
+                .map(catchMapper::toCatchResponse)
+                .toList();
     }
 }

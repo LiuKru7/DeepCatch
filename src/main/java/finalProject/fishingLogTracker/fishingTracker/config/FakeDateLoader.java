@@ -1,12 +1,16 @@
 package finalProject.fishingLogTracker.fishingTracker.config;
 
+import finalProject.fishingLogTracker.fishingTracker.entity.Aquatic;
 import finalProject.fishingLogTracker.fishingTracker.entity.Species;
+import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
+import finalProject.fishingLogTracker.fishingTracker.repository.AquaticRepository;
 import finalProject.fishingLogTracker.fishingTracker.repository.SpeciesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -14,6 +18,7 @@ import java.util.List;
 public class FakeDateLoader implements CommandLineRunner {
 
     private final SpeciesRepository speciesRepository;
+    private final AquaticRepository aquaticRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -52,6 +57,62 @@ public class FakeDateLoader implements CommandLineRunner {
 
         speciesRepository.saveAll(speciesList);
 
+
+            List<Aquatic> aquaticList = new ArrayList<>();
+
+            aquaticList.add(new Aquatic("Alytaus ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic("Asvejos ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic("Geležinio ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic("Ignalinos ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic("Kučio ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic("Lielais ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic("Neris", AquaticType.RIVER));
+            aquaticList.add(new Aquatic("Nemunas", AquaticType.RIVER));
+            aquaticList.add(new Aquatic("Šventoji", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Venta", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Mūša", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Ežerėlis", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Drūkšiai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Galvė", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Vidyžiai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Rūdupis", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Širvinta", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Taujėnai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Zarasai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Kražantė", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Ilgis", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Skrunda", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Lūšiai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Bielis", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Pankūnai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Paberžė", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Mingė", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Kuršiai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Biržų ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Platelių ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Pasvalys", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Šalčius", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Pakruojo ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Vilkaviškis", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Kupiškis", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Obeliai", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Trakai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Utena", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Pavandeniai", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Mūšos upė", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Dainava", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Daugai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Klimantiškiai", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Žeimena", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Kvietiniai ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Igliai", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Vilnia", AquaticType.RIVER));
+            aquaticList.add(new Aquatic( "Suvalkijos ežeras", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Vydmantai", AquaticType.LAKE));
+            aquaticList.add(new Aquatic( "Pakruojo upė", AquaticType.RIVER));
+
+
+        aquaticRepository.saveAll(aquaticList);
 
     }
 }
