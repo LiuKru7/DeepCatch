@@ -2,7 +2,7 @@ package finalProject.fishingLogTracker.fishingTracker.controller;
 
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
-import finalProject.fishingLogTracker.fishingTracker.entity.Catch;
+import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 import finalProject.fishingLogTracker.fishingTracker.service.CatchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +54,12 @@ public class CatchController {
         log.info("Received request to delete Catch: {}", id);
         catchService.deleteCatch(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/fishing_style/{style}")
+    public ResponseEntity<List<CatchResponse>> getCatchesByFishingStyle(@PathVariable FishingStyle style) {
+        log.info("Received request to get Catch by Fishing style: {}", style);
+        return ResponseEntity.ok(catchService.getCatchesByFishingStyle(style));
     }
 
 }
