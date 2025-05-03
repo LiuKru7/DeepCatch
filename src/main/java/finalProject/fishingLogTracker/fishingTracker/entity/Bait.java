@@ -26,4 +26,9 @@ public class Bait {
     @OneToMany(mappedBy = "bait")
     @JsonBackReference
     private List<Catch> catches = new ArrayList<>();
+
+    public Bait(BaitType baitType, String description) {
+        this.baitType = baitType;
+        this.description = description;
+    }
 }

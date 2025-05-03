@@ -1,9 +1,12 @@
 package finalProject.fishingLogTracker.fishingTracker.config;
 
 import finalProject.fishingLogTracker.fishingTracker.entity.Aquatic;
+import finalProject.fishingLogTracker.fishingTracker.entity.Bait;
 import finalProject.fishingLogTracker.fishingTracker.entity.Species;
 import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
+import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
 import finalProject.fishingLogTracker.fishingTracker.repository.AquaticRepository;
+import finalProject.fishingLogTracker.fishingTracker.repository.BaitRepository;
 import finalProject.fishingLogTracker.fishingTracker.repository.SpeciesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -19,6 +22,7 @@ public class FakeDateLoader implements CommandLineRunner {
 
     private final SpeciesRepository speciesRepository;
     private final AquaticRepository aquaticRepository;
+    private final BaitRepository baitRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -56,8 +60,6 @@ public class FakeDateLoader implements CommandLineRunner {
                 );
 
         speciesRepository.saveAll(speciesList);
-
-
             List<Aquatic> aquaticList = new ArrayList<>();
 
             aquaticList.add(new Aquatic("Alytaus ežeras", AquaticType.LAKE));
@@ -113,6 +115,61 @@ public class FakeDateLoader implements CommandLineRunner {
 
 
         aquaticRepository.saveAll(aquaticList);
+
+        List<Bait> baits = List.of(
+                new Bait(BaitType.WORM, "Universalus sliekas"),
+                new Bait(BaitType.GRUB, "Didelis dzikas"),
+                new Bait(BaitType.SPINNER, "Raudona blyžgė"),
+                new Bait(BaitType.MINNOW, "Žalias vobleris"),
+                new Bait(BaitType.SHRIMP, "Maža krevetė"),
+                new Bait(BaitType.FLY, "Juoda musė"),
+                new Bait(BaitType.CHEESE, "Brandintas sūris"),
+                new Bait(BaitType.MOTH, "Naktinė musė su raštais"),
+                new Bait(BaitType.CRAB, "Mažas krabas"),
+                new Bait(BaitType.WAXWORM, "Didelis vaškas"),
+                new Bait(BaitType.WORM, "Rudasis sliekas"),
+                new Bait(BaitType.GRUB, "Baltas dzikas"),
+                new Bait(BaitType.SPINNER, "Sidabrinė blyžgė"),
+                new Bait(BaitType.MINNOW, "Mėlynas vobleris"),
+                new Bait(BaitType.SHRIMP, "Didelė krevetė"),
+                new Bait(BaitType.FLY, "Geltona musė"),
+                new Bait(BaitType.CHEESE, "Šviežias sūris"),
+                new Bait(BaitType.MOTH, "Maža naktinė musė"),
+                new Bait(BaitType.CRAB, "Raudonas krabas"),
+                new Bait(BaitType.WAXWORM, "Mažas vaškas"),
+                new Bait(BaitType.WORM, "Juodas sliekas"),
+                new Bait(BaitType.GRUB, "Mažas dzikas"),
+                new Bait(BaitType.SPINNER, "Auksinė blyžgė"),
+                new Bait(BaitType.MINNOW, "Raudonas vobleris"),
+                new Bait(BaitType.SHRIMP, "Vidutinė krevetė"),
+                new Bait(BaitType.FLY, "Balta musė"),
+                new Bait(BaitType.CHEESE, "Pelėsinis sūris"),
+                new Bait(BaitType.MOTH, "Didelė naktinė musė"),
+                new Bait(BaitType.CRAB, "Žalias krabas"),
+                new Bait(BaitType.WAXWORM, "Baltas vaškas"),
+                new Bait(BaitType.WORM, "Mėlynas sliekas"),
+                new Bait(BaitType.GRUB, "Raudonas dzikas"),
+                new Bait(BaitType.SPINNER, "Žalia blyžgė"),
+                new Bait(BaitType.MINNOW, "Sidabrinis vobleris"),
+                new Bait(BaitType.SHRIMP, "Rožinė krevetė"),
+                new Bait(BaitType.FLY, "Žalia musė"),
+                new Bait(BaitType.CHEESE, "Kietas sūris"),
+                new Bait(BaitType.MOTH, "Spalvota naktinė musė"),
+                new Bait(BaitType.CRAB, "Didelis krabas"),
+                new Bait(BaitType.WAXWORM, "Geltonas vaškas"),
+                new Bait(BaitType.WORM, "Didelis sliekas"),
+                new Bait(BaitType.GRUB, "Žalias dzikas"),
+                new Bait(BaitType.SPINNER, "Juoda blyžgė"),
+                new Bait(BaitType.MINNOW, "Geltonas vobleris"),
+                new Bait(BaitType.SHRIMP, "Maža rožinė krevetė"),
+                new Bait(BaitType.FLY, "Raudona musė"),
+                new Bait(BaitType.CHEESE, "Minkštas sūris"),
+                new Bait(BaitType.MOTH, "Smulki naktinė musė"),
+                new Bait(BaitType.CRAB, "Mėlynas krabas"),
+                new Bait(BaitType.WAXWORM, "Raudonas vaškas")
+        );
+
+        baitRepository.saveAll(baits);
 
     }
 }
