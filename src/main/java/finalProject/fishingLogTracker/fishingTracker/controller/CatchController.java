@@ -23,7 +23,7 @@ public class CatchController {
     private final CatchService catchService;
 
     @PostMapping
-    public ResponseEntity<CatchResponse> addCatch(@RequestBody @Valid CatchRequest catchRequest) throws IOException {
+    public ResponseEntity<CatchResponse> addCatch(@RequestBody @Valid CatchRequest catchRequest)  {
         log.info("Received request to create Catch");
         CatchResponse newCatch = catchService.addCatch(catchRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCatch);

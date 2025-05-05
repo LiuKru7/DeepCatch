@@ -5,6 +5,7 @@ import finalProject.fishingLogTracker.auth.repository.UserRepository;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
 import finalProject.fishingLogTracker.fishingTracker.entity.*;
+import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
 import finalProject.fishingLogTracker.fishingTracker.mapper.CatchMapper;
@@ -36,14 +37,13 @@ public class CatchService {
     private final AquaticRepository aquaticRepository;
 
 
-    public CatchResponse addCatch(CatchRequest catchRequest) throws IOException {
+    public CatchResponse addCatch(CatchRequest catchRequest)  {
         log.info("Creating new Catch : {}", catchRequest);
         Catch catchEntity = catchMapper.toCatch(catchRequest);
 
 
         var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
                 .orElseThrow(()-> new EntityNotFoundException("Aquatic not found"));
-
         Bait bait = baitRepository.findById(catchRequest.baitId())
                 .orElseThrow(()-> new EntityNotFoundException("Bait not found"));
         Species species = speciesRepository.findById(catchRequest.speciesId())
@@ -119,6 +119,13 @@ public class CatchService {
 
     public List<CatchResponse> getCatchesByFishingStyle(final FishingStyle style) {
         var catches = catchRepository.findByFishingStyle(style);
+        return catches.stream()
+                .map(catchMapper::toCatchResponse)
+                .toList();
+    }
+
+    public List<CatchResponse> getCatchesByBait(final BaitType baitType) {
+        var catches = catchRepository.findByBait_BaitType(baitType);
         return catches.stream()
                 .map(catchMapper::toCatchResponse)
                 .toList();
