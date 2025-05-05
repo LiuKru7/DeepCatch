@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,6 +36,7 @@ public class CatchService {
     private final SpeciesRepository speciesRepository;
     private final BaitRepository baitRepository;
     private final AquaticRepository aquaticRepository;
+    private final ImageService imageService;
 
 
     public CatchResponse addCatch(CatchRequest catchRequest)  {
@@ -129,5 +131,38 @@ public class CatchService {
         return catches.stream()
                 .map(catchMapper::toCatchResponse)
                 .toList();
+    }
+
+    public CatchResponse addCatchWithPhoto(final CatchRequest catchRequest, final MultipartFile file) {
+        log.info("Creating new Catch : {}", catchRequest);
+        Catch catchEntity = catchMapper.toCatch(catchRequest);
+
+
+        var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
+                .orElseThrow(()-> new EntityNotFoundException("Aquatic not found"));
+        Bait bait = baitRepository.findById(catchRequest.baitId())
+                .orElseThrow(()-> new EntityNotFoundException("Bait not found"));
+        Species species = speciesRepository.findById(catchRequest.speciesId())
+                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
+        User user = userRepository.findById(catchRequest.userId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Location savedLocation = getLocation(catchRequest);
+        Weather savedWeather = getWeatherForLocation(savedLocation);
+
+        String fileName = imageService.saveFile(file);
+
+        catchEntity.setSpecies(species);
+        catchEntity.setUser(user);
+        catchEntity.setBait(bait);
+        catchEntity.setLocation(savedLocation);;
+        catchEntity.setWeather(savedWeather);
+        catchEntity.setAquatic(aquatic);
+        catchEntity.setPhotoUrl(fileName);
+
+
+        Catch savedCatch = catchRepository.save(catchEntity);
+        return catchMapper.toCatchResponse(savedCatch);
+
     }
 }

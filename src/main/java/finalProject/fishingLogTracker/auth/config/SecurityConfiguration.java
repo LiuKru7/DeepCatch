@@ -36,14 +36,15 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)  // Disables CSRF protection (common for REST APIs)
                 .authorizeHttpRequests(auth -> auth  // Starts request authorization configuration
-                        .requestMatchers("/api/**").permitAll()
+                                .requestMatchers("/api/**").permitAll()
+                                .requestMatchers("/api/uploads/**").permitAll()
 //                        .requestMatchers("/api/catch/**").permitAll()
 //                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
+                                .requestMatchers("/h2-console/**").permitAll()
 //                        .requestMatchers("/api/carparts/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
 //                        .requestMatchers("/api/carparts/admin/**").hasAnyAuthority("ROLE_ADMIN")
 //                        .requestMatchers("/api/supplier/admin/**").hasAnyAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
