@@ -21,4 +21,8 @@ public class Species {
     private String name;
     private String latinName;
 
+    public Species(String name, String latinName) {
+        this.name = name;
+        this.latinName = latinName;
+    }
 }
