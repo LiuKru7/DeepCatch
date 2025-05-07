@@ -38,9 +38,12 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth  // Starts request authorization configuration
                                 .requestMatchers("/api/**").permitAll()
                                 .requestMatchers("/api/uploads/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-ui.html").permitAll()
+                                .requestMatchers("/h2-console/**").permitAll()
 //                        .requestMatchers("/api/catch/**").permitAll()
 //                        .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/h2-console/**").permitAll()
 //                        .requestMatchers("/api/carparts/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
 //                        .requestMatchers("/api/carparts/admin/**").hasAnyAuthority("ROLE_ADMIN")
 //                        .requestMatchers("/api/supplier/admin/**").hasAnyAuthority("ROLE_ADMIN")
