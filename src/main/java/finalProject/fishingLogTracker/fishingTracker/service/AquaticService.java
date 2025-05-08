@@ -2,15 +2,21 @@ package finalProject.fishingLogTracker.fishingTracker.service;
 
 import finalProject.fishingLogTracker.fishingTracker.dto.AquaticRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.AquaticResponse;
+import finalProject.fishingLogTracker.fishingTracker.entity.Aquatic;
+import finalProject.fishingLogTracker.fishingTracker.entity.Catch;
+import finalProject.fishingLogTracker.fishingTracker.exception.AquaticNotFoundException;
+import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
 import finalProject.fishingLogTracker.fishingTracker.mapper.AquaticMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.AquaticRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AquaticService {
 
     private final AquaticRepository aquaticRepository;
@@ -26,4 +32,28 @@ public class AquaticService {
         var aquatic = aquaticRepository.save(aquaticMapper.toAquatic(aquaticRequest));
         return aquaticMapper.toAquaticResponse(aquatic);
     }
+
+    public AquaticResponse updateAquatic(Long id, AquaticRequest aquaticRequest) {
+        log.info("Updating Catch with ID: {}", id);
+        Aquatic existingAquatic = aquaticRepository.findById(id)
+                .orElseThrow(() -> new AquaticNotFoundException("Aquatic not found with id: " + id));
+
+        Aquatic updatedAquatic = aquaticMapper.toAquatic(aquaticRequest);
+        updatedAquatic.setId(existingAquatic.getId());
+        Aquatic saved = aquaticRepository.save(updatedAquatic);
+
+        return aquaticMapper.toAquaticResponse(saved);
+    }
+
+    public void deleteAquatic(Long id) {
+        log.info("Deleting Aquatic with ID: {}", id);
+
+        if (!aquaticRepository.existsById(id)) {
+            throw new AquaticNotFoundException("Aquatic not found with id: " + id);
+        }
+
+        aquaticRepository.deleteById(id);
+    }
 }
+
+
