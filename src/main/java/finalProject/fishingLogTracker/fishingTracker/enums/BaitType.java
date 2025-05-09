@@ -4,14 +4,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "BaitType")
 public enum BaitType {
-    WORM,      // Sliekas
-    GRUB,      // Dzikas
-    SPINNER,   // Blyžgė
-    MINNOW,    // Vobleris
-    SHRIMP,    // Krevetė
-    FLY,       // Musė
-    CHEESE,    // Sūris
-    MOTH,      // Naktinė musė
-    CRAB,      // Krabas
-    WAXWORM    // Vaškas
+
+    EARTHWORM,       // Sliekas
+    NIGHTCRAWLER,    // Naktinis sliekas
+    BLOODWORM,       // Uodo trūklio lerva
+    MAGGOT,          // Musės lerva
+    LEECH,           // Dėlės
+    MINNOW,          // Mažos žuvelės
+    BREAD,           // Duona
+    CORN,            // Kukurūzai
+    DOUGH,           // Tešla
+    FISH_PIECES,     // Žuvies gabalai
+    SPINNER,         // Sukriukė
+    SPOON,           // Blizgė
+    SOFT_LURE,       // Minkštas masalas
+    CRANKBAIT,       // Plūduriuojantis masalas
+    FLY,             // Muselė
+    BOILIE,          // Boilis
+    POP_UP,          // Pop-up boilis
+    PELLET,          // Granulės
 }
