@@ -1,13 +1,13 @@
 package finalProject.fishingLogTracker.fishingTracker.config;
 
+import finalProject.fishingLogTracker.auth.repository.UserRepository;
 import finalProject.fishingLogTracker.fishingTracker.entity.*;
 import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
 import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
-import finalProject.fishingLogTracker.fishingTracker.repository.AquaticRepository;
-import finalProject.fishingLogTracker.fishingTracker.repository.BaitRepository;
-import finalProject.fishingLogTracker.fishingTracker.repository.CatchRepository;
-import finalProject.fishingLogTracker.fishingTracker.repository.SpeciesRepository;
+import finalProject.fishingLogTracker.fishingTracker.enums.FriendshipStatus;
+import finalProject.fishingLogTracker.fishingTracker.repository.*;
+import finalProject.fishingLogTracker.fishingTracker.service.SpeciesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +27,8 @@ public class FakeDateLoader implements CommandLineRunner {
     private final AquaticRepository aquaticRepository;
     private final BaitRepository baitRepository;
     private final CatchRepository catchRepository;
+    private final UserRepository userRepository;
+    private final FriendshipRepository friendshipRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -223,8 +225,6 @@ public class FakeDateLoader implements CommandLineRunner {
                 .species(speciesList.get(1))
                 .aquatic(aquaticList.get(1))
                 .build();
-
-
         catchRepository.save(fish3);
 
     }

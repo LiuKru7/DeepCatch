@@ -42,6 +42,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/swagger-ui.html").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
 //                        .requestMatchers("/api/catch/**").permitAll()
 //                        .requestMatchers("/api/auth/**").permitAll()
 //                        .requestMatchers("/api/carparts/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
