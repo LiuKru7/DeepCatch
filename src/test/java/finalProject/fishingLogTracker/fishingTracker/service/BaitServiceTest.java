@@ -41,7 +41,7 @@ public class BaitServiceTest {
     void setUp() {
         wormBait = new Bait();
         wormBait.setId(1L);
-        wormBait.setBaitType(BaitType.WORM);
+        wormBait.setBaitType(BaitType.BLOODWORM);
         wormBait.setDescription("Common earthworm");
 
         spinnerBait = new Bait();
@@ -49,7 +49,7 @@ public class BaitServiceTest {
         spinnerBait.setBaitType(BaitType.SPINNER);
         spinnerBait.setDescription("Silver spinner");
 
-        wormResponse = new BaitResponse(1L, BaitType.WORM, "Common earthworm");
+        wormResponse = new BaitResponse(1L, BaitType.BLOODWORM, "Common earthworm");
         spinnerResponse = new BaitResponse(2L, BaitType.SPINNER, "Silver spinner");
         
         newBaitRequest = new BaitRequest(BaitType.FLY, "Artificial fly");
