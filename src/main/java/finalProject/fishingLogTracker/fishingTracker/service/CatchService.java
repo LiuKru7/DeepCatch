@@ -27,142 +27,141 @@ import java.util.List;
 @Transactional
 public class CatchService {
 
-    private final CatchRepository catchRepository;
-    private final CatchMapper catchMapper;
-    private final LocationRepository locationRepository;
-    private final WeatherService weatherService;
-    private final WeatherRepository weatherRepository;
-    private final UserRepository userRepository;
-    private final SpeciesRepository speciesRepository;
-    private final BaitRepository baitRepository;
-    private final AquaticRepository aquaticRepository;
-    private final ImageService imageService;
+        private final CatchRepository catchRepository;
+        private final CatchMapper catchMapper;
+        private final LocationRepository locationRepository;
+        private final WeatherService weatherService;
+        private final WeatherRepository weatherRepository;
+        private final UserRepository userRepository;
+        private final SpeciesRepository speciesRepository;
+        private final BaitRepository baitRepository;
+        private final AquaticRepository aquaticRepository;
+        private final ImageService imageService;
 
+        public CatchResponse addCatch(CatchRequest catchRequest) {
+                log.info("Creating new Catch : {}", catchRequest);
+                Catch catchEntity = catchMapper.toCatch(catchRequest);
 
-    public CatchResponse addCatch(CatchRequest catchRequest)  {
-        log.info("Creating new Catch : {}", catchRequest);
-        Catch catchEntity = catchMapper.toCatch(catchRequest);
+                var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
+                                .orElseThrow(() -> new EntityNotFoundException("Aquatic not found"));
+                Bait bait = baitRepository.findById(catchRequest.baitId())
+                                .orElseThrow(() -> new EntityNotFoundException("Bait not found"));
+                Species species = speciesRepository.findById(catchRequest.speciesId())
+                                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
+                User user = userRepository.findById(catchRequest.userId())
+                                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
+                Location savedLocation = getLocation(catchRequest);
+                Weather savedWeather = getWeatherForLocation(savedLocation);
 
-        var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
-                .orElseThrow(()-> new EntityNotFoundException("Aquatic not found"));
-        Bait bait = baitRepository.findById(catchRequest.baitId())
-                .orElseThrow(()-> new EntityNotFoundException("Bait not found"));
-        Species species = speciesRepository.findById(catchRequest.speciesId())
-                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
-        User user = userRepository.findById(catchRequest.userId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                catchEntity.setSpecies(species);
+                catchEntity.setUser(user);
+                catchEntity.setBait(bait);
+                catchEntity.setLocation(savedLocation);
+                ;
+                catchEntity.setWeather(savedWeather);
+                catchEntity.setAquatic(aquatic);
 
-        Location savedLocation = getLocation(catchRequest);
-        Weather savedWeather = getWeatherForLocation(savedLocation);
-
-        catchEntity.setSpecies(species);
-        catchEntity.setUser(user);
-        catchEntity.setBait(bait);
-        catchEntity.setLocation(savedLocation);;
-        catchEntity.setWeather(savedWeather);
-        catchEntity.setAquatic(aquatic);
-
-        Catch savedCatch = catchRepository.save(catchEntity);
-        return catchMapper.toCatchResponse(savedCatch);
-    }
-
-    private Weather getWeatherForLocation(Location savedLocation) {
-        Weather weather = weatherService.fetchWeather(savedLocation.getLatitude(), savedLocation.getLongitude());
-        return weatherRepository.save(weather);
-    }
-
-    private Location getLocation(final CatchRequest catchRequest) {
-        final Double latitude = catchRequest.latitude() != null ? catchRequest.latitude() : 55.3328;
-        final Double longitude = catchRequest.longitude() != null ? catchRequest.longitude() : 26.0606;
-        final String country = catchRequest.country() != null ? catchRequest.country() : "Lithuania";
-        final String region = catchRequest.region() != null ? catchRequest.region() : "Lazdijų Rajonas";
-
-        Location location = new Location(null, latitude, longitude, country, region);
-        return locationRepository.save(location);
-    }
-
-    public CatchResponse getCatchById(Long id) {
-        log.info("Fetching Catch with ID: {}", id);
-        Catch catchEntity = catchRepository.findById(id)
-                .orElseThrow(() -> new CatchNotFoundException("Catch not found with id: " + id));
-        return catchMapper.toCatchResponse(catchEntity);
-    }
-
-    public List<CatchResponse> getAllCatches() {
-        log.info("Fetching all Catch entries");
-        return catchRepository.findAll()
-                .stream()
-                .map(catchMapper::toCatchResponse)
-                .toList();
-    }
-
-    public CatchResponse updateCatch(Long id, CatchRequest catchRequest) {
-        log.info("Updating Catch with ID: {}", id);
-        Catch existingCatch = catchRepository.findById(id)
-                .orElseThrow(() -> new CatchNotFoundException("Catch not found with id: " + id));
-
-        Catch updatedCatch = catchMapper.toCatch(catchRequest);
-        updatedCatch.setId(existingCatch.getId());
-        Catch saved = catchRepository.save(updatedCatch);
-
-        return catchMapper.toCatchResponse(saved);
-    }
-
-    public void deleteCatch(Long id) {
-        log.info("Deleting Catch with ID: {}", id);
-
-        if (!catchRepository.existsById(id)) {
-            throw new CatchNotFoundException("Catch not found with id: " + id);
+                Catch savedCatch = catchRepository.save(catchEntity);
+                return catchMapper.toCatchResponse(savedCatch);
         }
 
-        catchRepository.deleteById(id);
-    }
+        private Weather getWeatherForLocation(Location savedLocation) {
+                Weather weather = weatherService.fetchWeather(savedLocation.getLatitude(),
+                                savedLocation.getLongitude());
+                return weatherRepository.save(weather);
+        }
 
-    public List<CatchResponse> getCatchesByFishingStyle(final FishingStyle style) {
-        var catches = catchRepository.findByFishingStyle(style);
-        return catches.stream()
-                .map(catchMapper::toCatchResponse)
-                .toList();
-    }
+        private Location getLocation(final CatchRequest catchRequest) {
+                final Double latitude = catchRequest.latitude() != null ? catchRequest.latitude() : 55.3328;
+                final Double longitude = catchRequest.longitude() != null ? catchRequest.longitude() : 26.0606;
+                final String country = catchRequest.country() != null ? catchRequest.country() : "Lithuania";
+                final String district = catchRequest.district() != null ? catchRequest.district() : "Lazdijų Rajonas";
 
-    public List<CatchResponse> getCatchesByBait(final BaitType baitType) {
-        var catches = catchRepository.findByBait_BaitType(baitType);
-        return catches.stream()
-                .map(catchMapper::toCatchResponse)
-                .toList();
-    }
+                Location location = new Location(null, latitude, longitude, country, district);
+                return locationRepository.save(location);
+        }
 
-    public CatchResponse addCatchWithPhoto(final CatchRequest catchRequest, final MultipartFile file) {
-        log.info("Creating new Catch : {}", catchRequest);
-        Catch catchEntity = catchMapper.toCatch(catchRequest);
+        public CatchResponse getCatchById(Long id) {
+                log.info("Fetching Catch with ID: {}", id);
+                Catch catchEntity = catchRepository.findById(id)
+                                .orElseThrow(() -> new CatchNotFoundException("Catch not found with id: " + id));
+                return catchMapper.toCatchResponse(catchEntity);
+        }
 
+        public List<CatchResponse> getAllCatches() {
+                log.info("Fetching all Catch entries");
+                return catchRepository.findAll()
+                                .stream()
+                                .map(catchMapper::toCatchResponse)
+                                .toList();
+        }
 
-        var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
-                .orElseThrow(()-> new EntityNotFoundException("Aquatic not found"));
-        Bait bait = baitRepository.findById(catchRequest.baitId())
-                .orElseThrow(()-> new EntityNotFoundException("Bait not found"));
-        Species species = speciesRepository.findById(catchRequest.speciesId())
-                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
-        User user = userRepository.findById(catchRequest.userId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        public CatchResponse updateCatch(Long id, CatchRequest catchRequest) {
+                log.info("Updating Catch with ID: {}", id);
+                Catch existingCatch = catchRepository.findById(id)
+                                .orElseThrow(() -> new CatchNotFoundException("Catch not found with id: " + id));
 
-        Location savedLocation = getLocation(catchRequest);
-        Weather savedWeather = getWeatherForLocation(savedLocation);
+                Catch updatedCatch = catchMapper.toCatch(catchRequest);
+                updatedCatch.setId(existingCatch.getId());
+                Catch saved = catchRepository.save(updatedCatch);
 
-        String fileName = imageService.saveFile(file);
+                return catchMapper.toCatchResponse(saved);
+        }
 
-        catchEntity.setSpecies(species);
-        catchEntity.setUser(user);
-        catchEntity.setBait(bait);
-        catchEntity.setLocation(savedLocation);;
-        catchEntity.setWeather(savedWeather);
-        catchEntity.setAquatic(aquatic);
-        catchEntity.setPhotoUrl(fileName);
+        public void deleteCatch(Long id) {
+                log.info("Deleting Catch with ID: {}", id);
 
+                if (!catchRepository.existsById(id)) {
+                        throw new CatchNotFoundException("Catch not found with id: " + id);
+                }
 
-        Catch savedCatch = catchRepository.save(catchEntity);
-        return catchMapper.toCatchResponse(savedCatch);
+                catchRepository.deleteById(id);
+        }
 
-    }
+        public List<CatchResponse> getCatchesByFishingStyle(final FishingStyle style) {
+                var catches = catchRepository.findByFishingStyle(style);
+                return catches.stream()
+                                .map(catchMapper::toCatchResponse)
+                                .toList();
+        }
+
+        public List<CatchResponse> getCatchesByBait(final BaitType baitType) {
+                var catches = catchRepository.findByBait_BaitType(baitType);
+                return catches.stream()
+                                .map(catchMapper::toCatchResponse)
+                                .toList();
+        }
+
+        public CatchResponse addCatchWithPhoto(final CatchRequest catchRequest, final MultipartFile file) {
+                log.info("Creating new Catch : {}", catchRequest);
+                Catch catchEntity = catchMapper.toCatch(catchRequest);
+
+                var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
+                                .orElseThrow(() -> new EntityNotFoundException("Aquatic not found"));
+                Bait bait = baitRepository.findById(catchRequest.baitId())
+                                .orElseThrow(() -> new EntityNotFoundException("Bait not found"));
+                Species species = speciesRepository.findById(catchRequest.speciesId())
+                                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
+                User user = userRepository.findById(catchRequest.userId())
+                                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+                Location savedLocation = getLocation(catchRequest);
+                Weather savedWeather = getWeatherForLocation(savedLocation);
+
+                String fileName = imageService.saveFile(file);
+
+                catchEntity.setSpecies(species);
+                catchEntity.setUser(user);
+                catchEntity.setBait(bait);
+                catchEntity.setLocation(savedLocation);
+                ;
+                catchEntity.setWeather(savedWeather);
+                catchEntity.setAquatic(aquatic);
+                catchEntity.setPhotoUrl(fileName);
+
+                Catch savedCatch = catchRepository.save(catchEntity);
+                return catchMapper.toCatchResponse(savedCatch);
+
+        }
 }

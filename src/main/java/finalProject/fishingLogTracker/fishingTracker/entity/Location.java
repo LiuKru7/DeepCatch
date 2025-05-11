@@ -23,7 +23,6 @@ public class Location {
     private Double latitude;
     private Double longitude;
     private String country;
-    private String region;
-
+    private String district;
 
 }
