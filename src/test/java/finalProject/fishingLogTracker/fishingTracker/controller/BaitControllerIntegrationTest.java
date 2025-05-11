@@ -43,7 +43,7 @@ public class BaitControllerIntegrationTest {
         baitRepository.deleteAll();
         
         Bait worm = new Bait();
-        worm.setBaitType(BaitType.WORM);
+        worm.setBaitType(BaitType.BLOODWORM);
         worm.setDescription("Common earthworm");
         
         Bait spinner = new Bait();
@@ -65,7 +65,7 @@ public class BaitControllerIntegrationTest {
                 BaitResponse[].class);
         
         assertThat(responses).hasSize(2);
-        assertThat(responses[0].baitType()).isEqualTo(BaitType.WORM);
+        assertThat(responses[0].baitType()).isEqualTo(BaitType.BLOODWORM);
         assertThat(responses[0].description()).isEqualTo("Common earthworm");
         assertThat(responses[1].baitType()).isEqualTo(BaitType.SPINNER);
         assertThat(responses[1].description()).isEqualTo("Silver spinner");
