@@ -4,6 +4,9 @@ package finalProject.fishingLogTracker.auth.config;
 import finalProject.fishingLogTracker.auth.enums.Role;
 import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.auth.repository.UserRepository;
+import finalProject.fishingLogTracker.fishingTracker.entity.Friendship;
+import finalProject.fishingLogTracker.fishingTracker.enums.FriendshipStatus;
+import finalProject.fishingLogTracker.fishingTracker.repository.FriendshipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +18,7 @@ public class FakeDataLoader implements CommandLineRunner {
 
     final private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FriendshipRepository friendshipRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -50,6 +54,44 @@ public class FakeDataLoader implements CommandLineRunner {
                 .build();
 
         userRepository.save(user3);
+
+        var user4 = User.builder()
+                .firstname("user1")
+                .lastname("user1")
+                .email("user@user1.lt")
+                .role(Role.ROLE_USER)
+                .username("user1")
+                .password(passwordEncoder.encode("user1"))
+                .build();
+
+        userRepository.save(user4);
+
+        var user5 = User.builder()
+                .firstname("user2")
+                .lastname("user2")
+                .email("user@user2.lt")
+                .role(Role.ROLE_USER)
+                .username("user2")
+                .password(passwordEncoder.encode("user2"))
+                .build();
+
+        userRepository.save(user5);
+
+        var friends = Friendship.builder()
+                .sender(userRepository.findByUsername("user").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("user1").orElseThrow(RuntimeException::new))
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        friendshipRepository.save(friends);
+
+        var friends2 = Friendship.builder()
+                .sender(userRepository.findByUsername("user").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("user2").orElseThrow(RuntimeException::new))
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        friendshipRepository.save(friends2);
 
     }
 }
