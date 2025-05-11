@@ -23,7 +23,7 @@ public interface CatchMapper {
     @Mapping(target = "latitude", source = "location.latitude")
     @Mapping(target = "longitude", source = "location.longitude")
     @Mapping(target = "country", source = "location.country")
-    @Mapping(target = "region", source = "location.region")
+    @Mapping(target = "district", source = "location.district")
     CatchResponse toCatchResponse(Catch catchEntity);
 
     @Mapping(target = "location", ignore = true)
