@@ -1,6 +1,5 @@
 package finalProject.fishingLogTracker.fishingTracker.repository;
 
-import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.fishingTracker.entity.Friendship;
 import finalProject.fishingLogTracker.fishingTracker.enums.FriendshipStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,5 +34,20 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     List<Friendship> findAcceptedFriendshipsForUser(@Param("userId") Long userId);
 
     Optional<Friendship> findBySenderIdAndReceiverIdAndStatus(Long senderId, Long receiverId, FriendshipStatus status);
+
+    @Query("""
+    SELECT CASE WHEN COUNT(f) > 0 THEN true ELSE false END
+    FROM Friendship f
+    WHERE (f.sender.id = :userId1 AND f.receiver.id = :userId2)
+       OR (f.sender.id = :userId2 AND f.receiver.id = :userId1)
+""")
+    boolean existsBySenderIdAndReceiverIdOrViceVersa(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
+
+    @Query("""
+        SELECT f FROM Friendship f
+        WHERE (f.sender.id = :userId1 AND f.receiver.id = :userId2)
+           OR (f.sender.id = :userId2 AND f.receiver.id = :userId1)
+    """)
+    Optional<Friendship> findByUsers(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
 
 }

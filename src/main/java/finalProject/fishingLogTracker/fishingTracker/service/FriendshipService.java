@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -36,7 +37,7 @@ public class FriendshipService {
     public List<UserResponse> getPendingRequestsReceived(Long id) {
         List<Friendship> all = friendshipRepository.findByReceiverIdAndStatus(id, FriendshipStatus.PENDING);
         return all.stream()
-                .map(Friendship::getReceiver)
+                .map(Friendship::getSender)
                 .map(userMapper::toUserDto)
                 .toList();
     }
@@ -44,12 +45,18 @@ public class FriendshipService {
     public List<UserResponse> getPendingRequestsSent(Long id) {
         List<Friendship> all = friendshipRepository.findBySenderIdAndStatus(id, FriendshipStatus.PENDING);
         return all.stream()
-                .map(Friendship::getSender)
+                .map(Friendship::getReceiver)
                 .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     public FriendshipResponse sentFriendshipRequest(Long senderId, Long receiverId) {
+        if (Objects.equals(senderId, receiverId)){
+            throw new RuntimeException("Friendship cant be sent");
+        }
+        if (friendshipRepository.existsBySenderIdAndReceiverIdOrViceVersa(senderId, receiverId)) {
+            throw new RuntimeException("Friendship already exists");
+        }
         System.out.println("Sender id: " + senderId);
         System.out.println("Receiver id: " + receiverId);
         var friendship = Friendship.builder()
@@ -70,7 +77,12 @@ public class FriendshipService {
     }
 
     public String deleteFriend(Long id, Long friendId) {
+            Friendship friendship = friendshipRepository.findByUsers(id, friendId)
+                    .orElseThrow(() -> new RuntimeException("Friendship not found"));
 
-        return "deleted";
+            friendshipRepository.delete(friendship);
+            return "Friendship deleted successfully";
+
+
     }
 }
