@@ -3,6 +3,7 @@ package finalProject.fishingLogTracker.fishingTracker.controller;
 import finalProject.fishingLogTracker.fishingTracker.dto.BaitRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.BaitResponse;
 import finalProject.fishingLogTracker.fishingTracker.service.BaitService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class BaitController {
     }
 
     @PostMapping
-    public ResponseEntity<BaitResponse> addNewBait(@RequestBody BaitRequest baitRequest) {
+    public ResponseEntity<BaitResponse> addNewBait(@Valid @RequestBody BaitRequest baitRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(baitService.addNewBait(baitRequest));
@@ -41,7 +42,7 @@ public class BaitController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBait(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBait(@PathVariable Long id) {
         log.info("Received request to delete Bait: {}", id);
         baitService.deleteBait(id);
         return ResponseEntity.noContent().build();

@@ -38,7 +38,7 @@ public class SpeciesService {
     public SpeciesResponse updateSpecies(Long id, SpeciesRequest speciesRequest) {
         log.info("Updating Species with ID: {}", id);
         Species existingSpecies = speciesRepository.findById(id)
-                .orElseThrow(() -> new SpeciesNotFoundException("Aquatic not found with id: " + id));
+                .orElseThrow(() -> new SpeciesNotFoundException("Species not found with id: " + id));
 
         Species updatedSpecies = speciesMapper.toSpecies(speciesRequest);
         updatedSpecies.setId(existingSpecies.getId());
@@ -47,7 +47,7 @@ public class SpeciesService {
         return speciesMapper.toSpeciesResponse(saved);
     }
 
-    public void deleteSpecies(long id) {
+    public void deleteSpecies(Long id) {
         log.info("Deleting Species with ID: {}", id);
 
         if (!speciesRepository.existsById(id)) {

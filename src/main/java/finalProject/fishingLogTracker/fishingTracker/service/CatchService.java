@@ -7,7 +7,10 @@ import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
 import finalProject.fishingLogTracker.fishingTracker.entity.*;
 import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
+import finalProject.fishingLogTracker.fishingTracker.exception.AquaticNotFoundException;
+import finalProject.fishingLogTracker.fishingTracker.exception.BaitNotFoundException;
 import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
+import finalProject.fishingLogTracker.fishingTracker.exception.SpeciesNotFoundException;
 import finalProject.fishingLogTracker.fishingTracker.mapper.CatchMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,11 +46,11 @@ public class CatchService {
                 Catch catchEntity = catchMapper.toCatch(catchRequest);
 
                 var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
-                                .orElseThrow(() -> new EntityNotFoundException("Aquatic not found"));
+                                .orElseThrow(() -> new AquaticNotFoundException("Aquatic not found"));
                 Bait bait = baitRepository.findById(catchRequest.baitId())
-                                .orElseThrow(() -> new EntityNotFoundException("Bait not found"));
+                                .orElseThrow(() -> new BaitNotFoundException("Bait not found"));
                 Species species = speciesRepository.findById(catchRequest.speciesId())
-                                .orElseThrow(() -> new EntityNotFoundException("Species not found"));
+                                .orElseThrow(() -> new SpeciesNotFoundException("Species not found"));
                 User user = userRepository.findById(catchRequest.userId())
                                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 

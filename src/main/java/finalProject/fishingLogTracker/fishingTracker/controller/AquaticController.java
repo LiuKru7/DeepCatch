@@ -20,7 +20,7 @@ public class AquaticController {
     private final AquaticService aquaticService;
 
     @GetMapping
-    private final ResponseEntity<List<AquaticResponse>> getAllAquatics() {
+    public ResponseEntity<List<AquaticResponse>> getAllAquatics() {
         return ResponseEntity.ok(aquaticService.getAllAquatics());
     }
 
