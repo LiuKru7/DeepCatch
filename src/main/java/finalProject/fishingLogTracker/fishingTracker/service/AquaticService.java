@@ -34,7 +34,7 @@ public class AquaticService {
     }
 
     public AquaticResponse updateAquatic(Long id, AquaticRequest aquaticRequest) {
-        log.info("Updating Catch with ID: {}", id);
+        log.info("Updating Aquatic with ID: {}", id);
         Aquatic existingAquatic = aquaticRepository.findById(id)
                 .orElseThrow(() -> new AquaticNotFoundException("Aquatic not found with id: " + id));
 

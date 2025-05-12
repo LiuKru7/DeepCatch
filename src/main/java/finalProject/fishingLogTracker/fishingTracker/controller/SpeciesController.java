@@ -22,12 +22,14 @@ public class SpeciesController {
 
     @GetMapping
     public ResponseEntity<List<SpeciesResponse>> getAllSpecies() {
+        log.info("Received request to get all species");
         return ResponseEntity.ok(speciesService.getAllSpecies());
     }
 
     @PostMapping
-    public ResponseEntity<SpeciesResponse> addNewSpecies(@RequestBody SpeciesRequest speciesRequest) {
-        return ResponseEntity.ok(speciesService.addNewSpecies(speciesRequest));
+    public ResponseEntity<SpeciesResponse> addNewSpecies(@Valid @RequestBody SpeciesRequest speciesRequest) {
+        log.info("Received request to add a new species: {}", speciesRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(speciesService.addNewSpecies(speciesRequest));
     }
 
     @PutMapping("/{id}")
@@ -39,7 +41,7 @@ public class SpeciesController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSpecies(@PathVariable long id) {
+    public ResponseEntity<Void> deleteSpecies(@PathVariable long id) {
         log.info("Received request to delete Species: {}", id);
         speciesService.deleteSpecies(id);
         return ResponseEntity.noContent().build();

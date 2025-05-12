@@ -62,7 +62,7 @@ public class CatchController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCatch(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCatch(@PathVariable Long id) {
         log.info("Received request to delete Catch: {}", id);
         catchService.deleteCatch(id);
         return ResponseEntity.noContent().build();
