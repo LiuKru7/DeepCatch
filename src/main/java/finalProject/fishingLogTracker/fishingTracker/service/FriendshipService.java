@@ -9,6 +9,7 @@ import finalProject.fishingLogTracker.fishingTracker.mapper.FriendshipMapper;
 import finalProject.fishingLogTracker.fishingTracker.mapper.UserMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.FriendshipRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FriendshipService {
@@ -29,7 +31,7 @@ public class FriendshipService {
     public List<UserResponse> getFriends(Long id) {
         List<Friendship> all = friendshipRepository.findAcceptedFriendshipsForUser(id);
         return all.stream()
-                .map(f -> f.getSender().equals(id) ? f.getReceiver() : f.getSender())
+                .map(f -> f.getSender().getId().equals(id) ? f.getReceiver() : f.getSender())
                 .map(userMapper::toUserDto)
                 .toList();
     }
