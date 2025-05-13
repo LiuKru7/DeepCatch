@@ -20,27 +20,26 @@ import java.util.List;
 public class MessageController {
 
     private final MessageService messageService;
-    private SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     @MessageMapping("/chat")
-    @SendTo("/topic/messages")
-    public ChatMessage sendMessage(ChatMessage message, Principal principal) {
+    @SendTo("/topic/group/messages")
+    public ChatMessage sendMessageToGroup(ChatMessage message, Principal principal) {
         message.setSender(principal.getName());
         return messageService.save(message);
     }
 
-//    @MessageMapping("/chat")
-//    public void sendMessage(ChatMessage message, Principal principal) {
-//        message.setSender(principal.getName());
-//        messageService.save(message);
-//
-//        messagingTemplate.convertAndSendToUser(
-//                message.getReceiver(),
-//                "/topic/messages",
-//                message
-//        );
-//    }
+    @MessageMapping("/chat")
+    public void sendMessage(ChatMessage message, Principal principal) {
+        message.setSender(principal.getName());
+        messageService.save(message);
+        messagingTemplate.convertAndSendToUser(
+                message.getReceiver(),
+                "/topic/messages",
+                message
+        );
+    }
 
 
     @GetMapping("api/messages/{friendUsername}")
