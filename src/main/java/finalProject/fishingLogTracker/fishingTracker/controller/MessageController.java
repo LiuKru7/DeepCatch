@@ -23,7 +23,7 @@ public class MessageController {
     private final SimpMessagingTemplate messagingTemplate;
 
 
-    @MessageMapping("/chat")
+    @MessageMapping("/groupChat")
     @SendTo("/topic/group/messages")
     public ChatMessage sendMessageToGroup(ChatMessage message, Principal principal) {
         message.setSender(principal.getName());
