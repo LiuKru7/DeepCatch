@@ -173,19 +173,19 @@ public class FakeDateLoader implements CommandLineRunner {
                 baitRepository.saveAll(baits);
 
                 var location = Location.builder()
-                                .latitude(43423.9)
-                                .longitude(5454.1)
+                                .latitude(55.4977)
+                                .longitude(25.5992)
                                 .country("Lithuania")
                                 .district("Utena")
                                 .build();
 
                 var fish = Catch.builder()
-                                .size(99.0)
+                                .size(80.0)
                                 .fishingStyle(FishingStyle.SPINNING)
                                 .description("Nice fishing")
                                 .time(new Timestamp(System.currentTimeMillis()).toLocalDateTime())
                                 .isReleased(true)
-                                .weight(8.0)
+                                .weight(5.0)
                                 .photoUrl("pike.png")
                                 .build();
                 fish.setBait(baits.get(0));
@@ -195,32 +195,48 @@ public class FakeDateLoader implements CommandLineRunner {
 
                 catchRepository.save(fish);
 
+                var location2 = Location.builder()
+                                .latitude(54.6872)
+                                .longitude(25.2797)
+                                .country("Lithuania")
+                                .district("Vilnius")
+                                .build();
+
                 var fish2 = Catch.builder()
-                                .size(99.0)
+                                .size(110.0)
                                 .fishingStyle(FishingStyle.SPINNING)
                                 .description("Nice fishing")
                                 .time(new Timestamp(System.currentTimeMillis()).toLocalDateTime())
                                 .isReleased(true)
-                                .weight(8.0)
+                                .weight(12.0)
                                 .photoUrl("lasisa.png")
                                 .bait(baits.get(1))
                                 .species(speciesList.get(1))
                                 .aquatic(aquaticList.get(1))
+                                .location(location2)
                                 .build();
 
                 catchRepository.save(fish2);
 
+                var location3 = Location.builder()
+                                .latitude(54.1617)
+                                .longitude(24.1867)
+                                .country("Lithuania")
+                                .district("Merkinė")
+                                .build();
+
                 var fish3 = Catch.builder()
-                                .size(99.0)
+                                .size(125.0)
                                 .fishingStyle(FishingStyle.FLOAT_FISHING)
                                 .description("Nice fishing")
                                 .time(new Timestamp(System.currentTimeMillis()).toLocalDateTime())
                                 .isReleased(true)
-                                .weight(8.0)
+                                .weight(17.0)
                                 .photoUrl("lasisa.png")
                                 .bait(baits.get(1))
                                 .species(speciesList.get(1))
                                 .aquatic(aquaticList.get(1))
+                                .location(location3)
                                 .build();
                 catchRepository.save(fish3);
 
