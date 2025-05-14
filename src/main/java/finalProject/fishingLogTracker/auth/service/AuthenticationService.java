@@ -37,6 +37,7 @@ public class AuthenticationService {
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.ROLE_USER)
+                .photoUrl("profile.png")
                 .build();
 
         repository.save(user);

@@ -29,6 +29,7 @@ public class FakeDataLoader implements CommandLineRunner {
                 .role(Role.ROLE_ADMIN)
                 .username("Slidra")
                 .password(passwordEncoder.encode("Slidra#312"))
+                .photoUrl("profile.png")
                 .build();
 
         userRepository.save(user);
@@ -39,6 +40,7 @@ public class FakeDataLoader implements CommandLineRunner {
                 .email("admin@slidra.lt")
                 .role(Role.ROLE_ADMIN)
                 .username("admin")
+                .photoUrl("profile.png")
                 .password(passwordEncoder.encode("Admin132#"))
                 .build();
 
@@ -50,6 +52,7 @@ public class FakeDataLoader implements CommandLineRunner {
                 .email("user@Slidra.lt")
                 .role(Role.ROLE_USER)
                 .username("user")
+                .photoUrl("profile.png")
                 .password(passwordEncoder.encode("user"))
                 .build();
 
@@ -60,8 +63,9 @@ public class FakeDataLoader implements CommandLineRunner {
                 .lastname("user1")
                 .email("user@user1.lt")
                 .role(Role.ROLE_USER)
-                .username("user1")
-                .password(passwordEncoder.encode("user1"))
+                .username("Liudvikas")
+                .photoUrl("liu.png")
+                .password(passwordEncoder.encode("user"))
                 .build();
 
         userRepository.save(user4);
@@ -71,15 +75,16 @@ public class FakeDataLoader implements CommandLineRunner {
                 .lastname("user2")
                 .email("user@user2.lt")
                 .role(Role.ROLE_USER)
-                .username("user2")
-                .password(passwordEncoder.encode("user2"))
+                .username("Mindaugas")
+                .photoUrl("min.png")
+                .password(passwordEncoder.encode("user"))
                 .build();
 
         userRepository.save(user5);
 
         var friends = Friendship.builder()
                 .sender(userRepository.findByUsername("user").orElseThrow(RuntimeException::new))
-                .receiver(userRepository.findByUsername("user1").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("Mindaugas").orElseThrow(RuntimeException::new))
                 .status(FriendshipStatus.ACCEPTED)
                 .build();
 
@@ -87,11 +92,34 @@ public class FakeDataLoader implements CommandLineRunner {
 
         var friends2 = Friendship.builder()
                 .sender(userRepository.findByUsername("user").orElseThrow(RuntimeException::new))
-                .receiver(userRepository.findByUsername("user2").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("Liudvikas").orElseThrow(RuntimeException::new))
                 .status(FriendshipStatus.ACCEPTED)
                 .build();
 
         friendshipRepository.save(friends2);
+
+        var friends3 = Friendship.builder()
+                .sender(userRepository.findByUsername("admin").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("Mindaugas").orElseThrow(RuntimeException::new))
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        friendshipRepository.save(friends3);
+
+        var friends4 = Friendship.builder()
+                .sender(userRepository.findByUsername("admin").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("Liudvikas").orElseThrow(RuntimeException::new))
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        friendshipRepository.save(friends4);
+        var friends5 = Friendship.builder()
+                .sender(userRepository.findByUsername("Mindaugas").orElseThrow(RuntimeException::new))
+                .receiver(userRepository.findByUsername("Liudvikas").orElseThrow(RuntimeException::new))
+                .status(FriendshipStatus.ACCEPTED)
+                .build();
+
+        friendshipRepository.save(friends5);
 
     }
 }
