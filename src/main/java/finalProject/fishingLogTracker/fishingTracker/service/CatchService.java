@@ -136,6 +136,14 @@ public class CatchService {
                                 .toList();
         }
 
+        public List<CatchResponse> getCatchesByUser(Long userId) {
+                log.info("Fetching catches for user ID: {}", userId);
+                var catches = catchRepository.findByUserId(userId);
+                return catches.stream()
+                                .map(catchMapper::toCatchResponse)
+                                .toList();
+        }
+
         public CatchResponse addCatchWithPhoto(final CatchRequest catchRequest, final MultipartFile file) {
                 log.info("Creating new Catch : {}", catchRequest);
                 Catch catchEntity = catchMapper.toCatch(catchRequest);
@@ -165,6 +173,5 @@ public class CatchService {
 
                 Catch savedCatch = catchRepository.save(catchEntity);
                 return catchMapper.toCatchResponse(savedCatch);
-
         }
 }

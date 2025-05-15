@@ -1,5 +1,6 @@
 package finalProject.fishingLogTracker.fishingTracker.controller;
 
+import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
@@ -10,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +29,7 @@ public class CatchController {
     private final CatchService catchService;
 
     @PostMapping("/withoutPhoto")
-    public ResponseEntity<CatchResponse> addCatch(@RequestBody @Valid CatchRequest catchRequest)  {
+    public ResponseEntity<CatchResponse> addCatch(@RequestBody @Valid CatchRequest catchRequest) {
         log.info("Received request to create Catch");
         CatchResponse newCatch = catchService.addCatch(catchRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCatch);
@@ -34,8 +38,7 @@ public class CatchController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CatchResponse> addCatchWithPhoto(
             @RequestPart("catch") CatchRequest catchRequest,
-            @RequestPart("file") MultipartFile file
-            )  {
+            @RequestPart("file") MultipartFile file) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(catchService.addCatchWithPhoto(catchRequest, file));
@@ -72,6 +75,14 @@ public class CatchController {
     public ResponseEntity<List<CatchResponse>> getCatchesByFishingStyle(@PathVariable FishingStyle style) {
         log.info("Received request to get Catch by Fishing style: {}", style);
         return ResponseEntity.ok(catchService.getCatchesByFishingStyle(style));
+    }
+
+    @GetMapping("/user")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<CatchResponse>> getUserCatches(Authentication authentication) {
+        log.info("Received request to get catches for authenticated user");
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(catchService.getCatchesByUser(user.getId()));
     }
 
 }
