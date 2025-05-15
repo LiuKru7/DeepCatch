@@ -1,5 +1,7 @@
 package finalProject.fishingLogTracker.fishingTracker.config;
 
+import finalProject.fishingLogTracker.auth.config.FakeDataLoader;
+import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.auth.repository.UserRepository;
 import finalProject.fishingLogTracker.fishingTracker.entity.*;
 import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
@@ -11,6 +13,7 @@ import finalProject.fishingLogTracker.fishingTracker.service.SpeciesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.sql.Time;
@@ -21,6 +24,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Order(2) // Run after auth FakeDataLoader
 public class FakeDateLoader implements CommandLineRunner {
 
         private final SpeciesRepository speciesRepository;
@@ -32,6 +36,10 @@ public class FakeDateLoader implements CommandLineRunner {
 
         @Override
         public void run(String... args) throws Exception {
+                // Get the existing user with better error handling
+                User existingUser = userRepository.findByUsername("user")
+                                .orElseThrow(() -> new IllegalStateException(
+                                                "User 'user' not found. Make sure auth.FakeDataLoader runs first."));
 
                 List<Species> speciesList = List.of(
                                 new Species("Pike", "Esox lucius"), // Lydeka
@@ -192,6 +200,7 @@ public class FakeDateLoader implements CommandLineRunner {
                 fish.setAquatic(aquaticList.get(0));
                 fish.setSpecies(speciesList.get(0));
                 fish.setLocation(location);
+                fish.setUser(existingUser);
 
                 catchRepository.save(fish);
 
@@ -214,6 +223,7 @@ public class FakeDateLoader implements CommandLineRunner {
                                 .species(speciesList.get(1))
                                 .aquatic(aquaticList.get(1))
                                 .location(location2)
+                                .user(existingUser)
                                 .build();
 
                 catchRepository.save(fish2);
@@ -237,8 +247,8 @@ public class FakeDateLoader implements CommandLineRunner {
                                 .species(speciesList.get(1))
                                 .aquatic(aquaticList.get(1))
                                 .location(location3)
+                                .user(existingUser)
                                 .build();
                 catchRepository.save(fish3);
-
         }
 }

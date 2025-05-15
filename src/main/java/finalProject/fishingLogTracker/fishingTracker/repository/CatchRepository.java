@@ -13,4 +13,6 @@ public interface CatchRepository extends JpaRepository<Catch, Long> {
     List<Catch> findByFishingStyle(FishingStyle fishingStyle);
 
     List<Catch> findByBait_BaitType(BaitType baitType);
+
+    List<Catch> findByUserId(Long userId);
 }
