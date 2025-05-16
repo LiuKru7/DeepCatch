@@ -25,7 +25,7 @@ public class AquaticController {
     }
 
     @PostMapping
-    private final ResponseEntity<AquaticResponse> addNewAquatic(
+    public ResponseEntity<AquaticResponse> addNewAquatic(
             @RequestBody final AquaticRequest aquaticRequest) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
