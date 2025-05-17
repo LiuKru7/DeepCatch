@@ -1,5 +1,6 @@
 package finalProject.fishingLogTracker.fishingTracker.service;
 
+import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.auth.repository.UserRepository;
 import finalProject.fishingLogTracker.fishingTracker.dto.FriendshipResponse;
 import finalProject.fishingLogTracker.fishingTracker.dto.UserResponse;
@@ -84,7 +85,11 @@ public class FriendshipService {
 
             friendshipRepository.delete(friendship);
             return "Friendship deleted successfully";
+    }
 
-
+    public List<String> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(User::getUsername)
+                .toList();
     }
 }

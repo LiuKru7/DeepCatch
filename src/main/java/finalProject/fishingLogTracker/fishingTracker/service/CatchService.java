@@ -144,7 +144,7 @@ public class CatchService {
                                 .toList();
         }
 
-        public CatchResponse addCatchWithPhoto(final CatchRequest catchRequest, final MultipartFile file) {
+        public CatchResponse addCatchWithPhoto(final CatchRequest catchRequest, final MultipartFile file, final Long userId) {
                 log.info("Creating new Catch : {}", catchRequest);
                 Catch catchEntity = catchMapper.toCatch(catchRequest);
 
@@ -154,7 +154,7 @@ public class CatchService {
                                 .orElseThrow(() -> new EntityNotFoundException("Bait not found"));
                 Species species = speciesRepository.findById(catchRequest.speciesId())
                                 .orElseThrow(() -> new EntityNotFoundException("Species not found"));
-                User user = userRepository.findById(catchRequest.userId())
+                User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
                 Location savedLocation = getLocation(catchRequest);
@@ -173,5 +173,12 @@ public class CatchService {
 
                 Catch savedCatch = catchRepository.save(catchEntity);
                 return catchMapper.toCatchResponse(savedCatch);
+        }
+
+        public List<CatchResponse> getCatchesByUserId(Long id) {
+                List<Catch> catches = catchRepository.findByUserId(id);
+                return catches.stream()
+                        .map(catchMapper::toCatchResponse)
+                        .toList();
         }
 }

@@ -1,4 +1,4 @@
-package finalProject.fishingLogTracker.config;
+package finalProject.fishingLogTracker.fishingTracker.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

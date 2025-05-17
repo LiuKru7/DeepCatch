@@ -1,6 +1,7 @@
 package finalProject.fishingLogTracker.fishingTracker.controller;
 
 import finalProject.fishingLogTracker.auth.model.User;
+import finalProject.fishingLogTracker.fishingTracker.dto.UpdateProfileRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.UserResponse;
 import finalProject.fishingLogTracker.fishingTracker.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,15 @@ public class ProfileController {
                 .body(profileService.changeProfilePhoto(user.getId(), file));
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<UserResponse> getProfileInfo(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(profileService.getProfileInfo(user.getId()));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UserResponse> updateProfile(
+            @AuthenticationPrincipal User user,
+            @RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(profileService.updateProfile(user.getId(), request));
     }
 }
