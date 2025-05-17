@@ -38,16 +38,8 @@ public class MessageService {
         User u1 = userRepository.findByUsername(user1).orElse(null);
         User u2 = userRepository.findByUsername(user2).orElse(null);
 
-        if (u1 == null || u2 == null) {
-            System.out.println("Vienas iš vartotojų nerastas.");
-            return List.of(); // tuščias sąrašas vietoj klaidos
-        }
-
         var messages = messageRepository
                 .findBySenderAndReceiverOrReceiverAndSenderOrderBySentAtAsc(u1, u2, u1, u2);
-
-        System.out.println("Rasta žinučių: " + messages.size());
-        System.out.println(messages);
 
         return messages.stream()
                 .map(m -> {

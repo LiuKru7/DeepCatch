@@ -23,6 +23,13 @@ public class FriendshipController {
         return ResponseEntity.ok(friendshipService.getFriends(user.getId()));
     }
 
+
+
+    @GetMapping("/userlist")
+    public ResponseEntity<List<String>> getAllUsers() {
+        return ResponseEntity.ok(friendshipService.getAllUsers());
+    }
+
     @PostMapping()
     public ResponseEntity<FriendshipResponse> addToFriend(@AuthenticationPrincipal User user, @RequestBody Long friendId) {
         return ResponseEntity.ok(friendshipService.sentFriendshipRequest(user.getId(), friendId));

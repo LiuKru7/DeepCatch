@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,11 +38,12 @@ public class CatchController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CatchResponse> addCatchWithPhoto(
+            @AuthenticationPrincipal User user,
             @RequestPart("catch") CatchRequest catchRequest,
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(catchService.addCatchWithPhoto(catchRequest, file));
+                .body(catchService.addCatchWithPhoto(catchRequest, file, user.getId()));
     }
 
     @GetMapping("/{id}")
@@ -83,6 +85,12 @@ public class CatchController {
         log.info("Received request to get catches for authenticated user");
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(catchService.getCatchesByUser(user.getId()));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<CatchResponse>> getCatchesByUserId(@PathVariable Long id) {
+        log.info("Received request to get Catch by ID: {}", id);
+        return ResponseEntity.ok(catchService.getCatchesByUserId(id));
     }
 
 }
