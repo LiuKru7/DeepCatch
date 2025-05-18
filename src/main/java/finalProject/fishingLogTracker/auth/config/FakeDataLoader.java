@@ -110,14 +110,14 @@ public class FakeDataLoader implements CommandLineRunner {
                 var friends4 = Friendship.builder()
                                 .sender(userRepository.findByUsername("admin").orElseThrow(RuntimeException::new))
                                 .receiver(userRepository.findByUsername("Liudvikas").orElseThrow(RuntimeException::new))
-                                .status(FriendshipStatus.ACCEPTED)
+                                .status(FriendshipStatus.PENDING)
                                 .build();
 
                 friendshipRepository.save(friends4);
                 var friends5 = Friendship.builder()
                                 .sender(userRepository.findByUsername("Mindaugas").orElseThrow(RuntimeException::new))
                                 .receiver(userRepository.findByUsername("Liudvikas").orElseThrow(RuntimeException::new))
-                                .status(FriendshipStatus.ACCEPTED)
+                                .status(FriendshipStatus.PENDING)
                                 .build();
 
                 friendshipRepository.save(friends5);

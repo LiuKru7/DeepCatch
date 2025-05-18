@@ -26,13 +26,13 @@ public class FriendshipController {
 
 
     @GetMapping("/userlist")
-    public ResponseEntity<List<String>> getAllUsers() {
-        return ResponseEntity.ok(friendshipService.getAllUsers());
+    public ResponseEntity<List<String>> getAllUsers(@AuthenticationPrincipal User user ) {
+        return ResponseEntity.ok(friendshipService.getAllUsers(user.getId()));
     }
 
     @PostMapping()
-    public ResponseEntity<FriendshipResponse> addToFriend(@AuthenticationPrincipal User user, @RequestBody Long friendId) {
-        return ResponseEntity.ok(friendshipService.sentFriendshipRequest(user.getId(), friendId));
+    public ResponseEntity<FriendshipResponse> addToFriend(@AuthenticationPrincipal User user, @RequestBody String username) {
+        return ResponseEntity.ok(friendshipService.sentFriendshipRequest(user.getId(), username));
     }
     @GetMapping("/received")
     public ResponseEntity<List<UserResponse>> getPendingRequestsReceived(@AuthenticationPrincipal User user) {

@@ -81,7 +81,7 @@ public class CatchController {
 
     @GetMapping("/user")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<CatchResponse>> getUserCatches(Authentication authentication) {
+    public ResponseEntity<List<CatchResponse>> getUserCatches(final Authentication authentication) {
         log.info("Received request to get catches for authenticated user");
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(catchService.getCatchesByUser(user.getId()));
