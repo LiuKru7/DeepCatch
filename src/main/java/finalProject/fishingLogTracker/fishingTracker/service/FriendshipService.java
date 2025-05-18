@@ -53,7 +53,10 @@ public class FriendshipService {
                 .collect(Collectors.toList());
     }
 
-    public FriendshipResponse sentFriendshipRequest(Long senderId, Long receiverId) {
+    public FriendshipResponse sentFriendshipRequest(Long senderId, String username) {
+        var user = userRepository.findByUsername(username).orElseThrow(()->new RuntimeException("User not found"));
+        var receiverId = user.getId();
+
         if (Objects.equals(senderId, receiverId)){
             throw new RuntimeException("Friendship cant be sent");
         }
@@ -73,11 +76,13 @@ public class FriendshipService {
 
     public FriendshipResponse acceptRequest(Long senderId, Long friendId) {
         Friendship friendship = friendshipRepository
-                .findBySenderIdAndReceiverIdAndStatus(senderId, friendId, FriendshipStatus.PENDING)
-                .orElseThrow(() -> new RuntimeException("Request not found"));
+                .findBySenderIdAndReceiverIdAndStatus(friendId, senderId, FriendshipStatus.PENDING)
+                .orElseThrow(() -> new RuntimeException("No pending friend request from user %d to user %d"
+                        .formatted(senderId, friendId)));
         friendship.setStatus(FriendshipStatus.ACCEPTED);
         return friendshipMapper.toFriendshipResponse(friendshipRepository.save(friendship));
     }
+
 
     public String deleteFriend(Long id, Long friendId) {
             Friendship friendship = friendshipRepository.findByUsers(id, friendId)
@@ -87,8 +92,10 @@ public class FriendshipService {
             return "Friendship deleted successfully";
     }
 
-    public List<String> getAllUsers() {
+    public List<String> getAllUsers(Long id) {
+
         return userRepository.findAll().stream()
+                .filter(user-> !user.getId().equals(id))
                 .map(User::getUsername)
                 .toList();
     }
