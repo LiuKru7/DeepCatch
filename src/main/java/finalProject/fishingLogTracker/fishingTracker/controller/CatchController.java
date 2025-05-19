@@ -42,7 +42,7 @@ public class CatchController {
             @RequestPart("file") final MultipartFile file) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(catchService.addCatchWithPhoto(catchRequest, file, user.getId()));
+                .body(catchService.addNewCatch(catchRequest, file, user.getId()));
     }
 
     /**

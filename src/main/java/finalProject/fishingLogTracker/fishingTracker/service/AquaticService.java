@@ -51,11 +51,9 @@ public class AquaticService {
     @CacheEvict(value = "aquatics", allEntries = true)
     public void deleteAquatic(final Long id) {
         log.info("Deleting Aquatic with ID: {}", id);
-
         if (!aquaticRepository.existsById(id)) {
             throw new AquaticNotFoundException("Aquatic not found with id: " + id);
         }
-
         aquaticRepository.deleteById(id);
     }
 }
