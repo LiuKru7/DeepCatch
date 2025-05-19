@@ -43,7 +43,7 @@ public class CatchController {
 
         log.info("Received request to add catch with photo for user ID: {}", user.getId());
 
-        CatchResponse createdCatch = catchService.addCatchWithPhoto(catchRequest, file, user.getId());
+        CatchResponse createdCatch = catchService.addNewCatch(catchRequest, file, user.getId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

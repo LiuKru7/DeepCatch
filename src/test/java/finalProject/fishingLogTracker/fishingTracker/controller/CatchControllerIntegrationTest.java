@@ -156,7 +156,7 @@ class CatchControllerIntegrationTest {
                 "dummy image content".getBytes()
         );
 
-        Mockito.when(catchService.addCatchWithPhoto(
+        Mockito.when(catchService.addNewCatch(
                 Mockito.any(CatchRequest.class),
                 Mockito.any(MultipartFile.class),
                 Mockito.eq(mockUser.getId())
