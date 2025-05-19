@@ -1,7 +1,6 @@
 package finalProject.fishingLogTracker.fishingTracker.config;
 
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +10,6 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("baits", "aquatics", "species");
+        return new ConcurrentMapCacheManager("baits", "aquatics", "species","catches", "allCatches", "userCatches", "styleCatches", "baitCatches");
     }
 }
