@@ -9,6 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
+    /**
+     * Configures the OpenAPI documentation for the Fishing Log Tracker application.
+     *
+     * @return the OpenAPI specification with custom title, description, and contact info
+     */
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()

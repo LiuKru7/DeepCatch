@@ -1,5 +1,6 @@
 package finalProject.fishingLogTracker.fishingTracker.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -14,25 +15,45 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
+@Slf4j
 public class FileAccessController {
 
+    /**
+     * Retrieves a file from the 'uploads' directory by filename.
+     * <p>
+     * The method checks if the file exists, detects its content type,
+     * and returns it as a downloadable resource.
+     * If the file is not found or an error occurs, it returns an appropriate HTTP status.
+     *
+     * @param filename the name of the file to retrieve
+     * @return ResponseEntity containing the file as a Resource, or an error status
+     */
     @GetMapping("/api/uploads/{filename:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> getFile(@PathVariable final String filename) {
+        log.info("Received request to download file: {}", filename);
+
         try {
             Path filePath = Paths.get("uploads").resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists()) {
+                log.warn("File not found: {}", filename);
                 return ResponseEntity.notFound().build();
             }
 
+            String contentType = Files.probeContentType(filePath);
+            MediaType mediaType = (contentType != null)
+                    ? MediaType.parseMediaType(contentType)
+                    : MediaType.APPLICATION_OCTET_STREAM;
+
+            log.info("Successfully found file: {}, content type: {}", filename, mediaType);
+
             return ResponseEntity.ok()
-                    .contentType(Files.probeContentType(filePath) != null ?
-                            MediaType.parseMediaType(Files.probeContentType(filePath)) :
-                            MediaType.APPLICATION_OCTET_STREAM)
+                    .contentType(mediaType)
                     .body(resource);
 
         } catch (IOException e) {
+            log.error("Error while reading file: {}", filename, e);
             return ResponseEntity.internalServerError().build();
         }
     }
