@@ -8,6 +8,8 @@ import finalProject.fishingLogTracker.fishingTracker.mapper.AquaticMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.AquaticRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,17 +22,20 @@ public class AquaticService {
     private final AquaticRepository aquaticRepository;
     private final AquaticMapper aquaticMapper;
 
+    @Cacheable("aquatics")
     public List<AquaticResponse> getAllAquatics() {
         return aquaticRepository.findAll().stream()
                 .map(aquaticMapper::toAquaticResponse)
                 .toList();
     }
 
+    @CacheEvict(value = "aquatics", allEntries = true)
     public AquaticResponse addNewAquatic(final AquaticRequest aquaticRequest) {
         var aquatic = aquaticRepository.save(aquaticMapper.toAquatic(aquaticRequest));
         return aquaticMapper.toAquaticResponse(aquatic);
     }
 
+    @CacheEvict(value = "aquatics", allEntries = true)
     public AquaticResponse updateAquatic(final Long id, final AquaticRequest aquaticRequest) {
         log.info("Updating Aquatic with ID: {}", id);
         Aquatic existingAquatic = aquaticRepository.findById(id)
@@ -43,6 +48,7 @@ public class AquaticService {
         return aquaticMapper.toAquaticResponse(saved);
     }
 
+    @CacheEvict(value = "aquatics", allEntries = true)
     public void deleteAquatic(final Long id) {
         log.info("Deleting Aquatic with ID: {}", id);
 

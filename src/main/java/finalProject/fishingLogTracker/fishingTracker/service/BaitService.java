@@ -10,6 +10,8 @@ import finalProject.fishingLogTracker.fishingTracker.mapper.BaitMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.BaitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,17 +25,21 @@ public class BaitService {
     private final BaitMapper baitMapper;
 
 
+    @Cacheable("baits")
     public List<BaitResponse> getAllBaits() {
+        System.out.println("YRA YRA YRA YRA YRA YRA YRA YRA");
         return baitRepository.findAll().stream()
                 .map(baitMapper::toBaitResponse)
                 .toList();
     }
 
+    @CacheEvict(value = "baits", allEntries = true)
     public BaitResponse addNewBait(BaitRequest baitRequest) {
         var bait = baitRepository.save(baitMapper.toBait(baitRequest));
         return baitMapper.toBaitResponse(bait);
     }
 
+    @CacheEvict(value = "baits", allEntries = true)
     public BaitResponse updateBait(Long id, BaitRequest baitRequest) {
         log.info("Updating Bait with ID: {}", id);
         Bait existingBait = baitRepository.findById(id)
@@ -45,6 +51,7 @@ public class BaitService {
         return baitMapper.toBaitResponse(saved);
     }
 
+    @CacheEvict(value = "baits", allEntries = true)
     public void deleteBait(Long id) {
         log.info("Deleting Bait with ID: {}", id);
 
