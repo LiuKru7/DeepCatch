@@ -1,25 +1,18 @@
 package finalProject.fishingLogTracker.fishingTracker.config;
 
-import finalProject.fishingLogTracker.auth.config.FakeDataLoader;
 import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.auth.repository.UserRepository;
 import finalProject.fishingLogTracker.fishingTracker.entity.*;
 import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
 import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
-import finalProject.fishingLogTracker.fishingTracker.enums.FriendshipStatus;
 import finalProject.fishingLogTracker.fishingTracker.repository.*;
-import finalProject.fishingLogTracker.fishingTracker.service.SpeciesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

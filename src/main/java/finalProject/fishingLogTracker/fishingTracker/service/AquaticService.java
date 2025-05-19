@@ -3,9 +3,7 @@ package finalProject.fishingLogTracker.fishingTracker.service;
 import finalProject.fishingLogTracker.fishingTracker.dto.AquaticRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.AquaticResponse;
 import finalProject.fishingLogTracker.fishingTracker.entity.Aquatic;
-import finalProject.fishingLogTracker.fishingTracker.entity.Catch;
 import finalProject.fishingLogTracker.fishingTracker.exception.AquaticNotFoundException;
-import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
 import finalProject.fishingLogTracker.fishingTracker.mapper.AquaticMapper;
 import finalProject.fishingLogTracker.fishingTracker.repository.AquaticRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class AquaticService {
         return aquaticMapper.toAquaticResponse(aquatic);
     }
 
-    public AquaticResponse updateAquatic(Long id, AquaticRequest aquaticRequest) {
+    public AquaticResponse updateAquatic(final Long id, final AquaticRequest aquaticRequest) {
         log.info("Updating Aquatic with ID: {}", id);
         Aquatic existingAquatic = aquaticRepository.findById(id)
                 .orElseThrow(() -> new AquaticNotFoundException("Aquatic not found with id: " + id));
@@ -45,7 +43,7 @@ public class AquaticService {
         return aquaticMapper.toAquaticResponse(saved);
     }
 
-    public void deleteAquatic(Long id) {
+    public void deleteAquatic(final Long id) {
         log.info("Deleting Aquatic with ID: {}", id);
 
         if (!aquaticRepository.existsById(id)) {

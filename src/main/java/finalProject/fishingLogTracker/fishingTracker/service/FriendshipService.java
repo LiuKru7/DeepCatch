@@ -84,12 +84,10 @@ public class FriendshipService {
     }
 
 
-    public String deleteFriend(Long id, Long friendId) {
+    public void deleteFriend(Long id, Long friendId) {
             Friendship friendship = friendshipRepository.findByUsers(id, friendId)
                     .orElseThrow(() -> new RuntimeException("Friendship not found"));
-
             friendshipRepository.delete(friendship);
-            return "Friendship deleted successfully";
     }
 
     public List<String> getAllUsers(Long id) {
