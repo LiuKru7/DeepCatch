@@ -12,6 +12,8 @@ import finalProject.fishingLogTracker.fishingTracker.repository.SpeciesRepositor
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,17 +26,20 @@ public class SpeciesService {
     private final SpeciesRepository speciesRepository;
     private final SpeciesMapper speciesMapper;
 
+    @Cacheable("species")
     public List<SpeciesResponse> getAllSpecies() {
         return speciesRepository.findAll().stream()
                 .map(speciesMapper::toSpeciesResponse)
                 .toList();
     }
 
+    @CacheEvict(value = "species", allEntries = true)
     public SpeciesResponse addNewSpecies(SpeciesRequest speciesRequest) {
         Species species = speciesRepository.save(speciesMapper.toSpecies(speciesRequest));
         return speciesMapper.toSpeciesResponse(species);
     }
 
+    @CacheEvict(value = "species", allEntries = true)
     public SpeciesResponse updateSpecies(Long id, SpeciesRequest speciesRequest) {
         log.info("Updating Species with ID: {}", id);
         Species existingSpecies = speciesRepository.findById(id)
@@ -47,6 +52,7 @@ public class SpeciesService {
         return speciesMapper.toSpeciesResponse(saved);
     }
 
+    @CacheEvict(value = "species", allEntries = true)
     public void deleteSpecies(Long id) {
         log.info("Deleting Species with ID: {}", id);
 

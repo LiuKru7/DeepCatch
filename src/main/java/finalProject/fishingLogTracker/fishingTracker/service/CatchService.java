@@ -41,34 +41,6 @@ public class CatchService {
         private final AquaticRepository aquaticRepository;
         private final ImageService imageService;
 
-        public CatchResponse addCatch(CatchRequest catchRequest) {
-                log.info("Creating new Catch : {}", catchRequest);
-                Catch catchEntity = catchMapper.toCatch(catchRequest);
-
-                var aquatic = aquaticRepository.findById(catchRequest.aquaticId())
-                                .orElseThrow(() -> new AquaticNotFoundException("Aquatic not found"));
-                Bait bait = baitRepository.findById(catchRequest.baitId())
-                                .orElseThrow(() -> new BaitNotFoundException("Bait not found"));
-                Species species = speciesRepository.findById(catchRequest.speciesId())
-                                .orElseThrow(() -> new SpeciesNotFoundException("Species not found"));
-                User user = userRepository.findById(catchRequest.userId())
-                                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-                Location savedLocation = getLocation(catchRequest);
-                Weather savedWeather = getWeatherForLocation(savedLocation);
-
-                catchEntity.setSpecies(species);
-                catchEntity.setUser(user);
-                catchEntity.setBait(bait);
-                catchEntity.setLocation(savedLocation);
-                ;
-                catchEntity.setWeather(savedWeather);
-                catchEntity.setAquatic(aquatic);
-
-                Catch savedCatch = catchRepository.save(catchEntity);
-                return catchMapper.toCatchResponse(savedCatch);
-        }
-
         private Weather getWeatherForLocation(Location savedLocation) {
                 Weather weather = weatherService.fetchWeather(savedLocation.getLatitude(),
                                 savedLocation.getLongitude());
