@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -119,7 +120,8 @@ class SpeciesControllerIntegrationTest {
 
         Mockito.doNothing().when(speciesService).deleteSpecies(id);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/species/{id}", id))
+        mockMvc.perform(delete("/api/species/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         Mockito.verify(speciesService, Mockito.times(1)).deleteSpecies(id);
@@ -146,8 +148,8 @@ class SpeciesControllerIntegrationTest {
                 .thenThrow(new SpeciesNotFoundException("Species not found with id: " + badId));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/species/{id}", badId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Species not found with id: " + badId));
     }
