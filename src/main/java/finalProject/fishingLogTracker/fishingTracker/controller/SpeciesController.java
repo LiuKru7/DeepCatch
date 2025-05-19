@@ -28,7 +28,8 @@ public class SpeciesController {
     @GetMapping
     public ResponseEntity<List<SpeciesResponse>> getAllSpecies() {
         log.info("Received request to get all species");
-        return ResponseEntity.ok(speciesService.getAllSpecies());
+        List<SpeciesResponse> speciesList = speciesService.getAllSpecies();
+        return ResponseEntity.ok(speciesList);
     }
 
     /**
@@ -40,13 +41,14 @@ public class SpeciesController {
     @PostMapping
     public ResponseEntity<SpeciesResponse> addNewSpecies(@Valid @RequestBody final SpeciesRequest speciesRequest) {
         log.info("Received request to add a new species: {}", speciesRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(speciesService.addNewSpecies(speciesRequest));
+        SpeciesResponse createdSpecies = speciesService.addNewSpecies(speciesRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSpecies);
     }
 
     /**
      * Updates an existing species.
      *
-     * @param id the ID of the species to update
+     * @param id             the ID of the species to update
      * @param speciesRequest the updated species data
      * @return the updated SpeciesResponse
      */
@@ -55,7 +57,8 @@ public class SpeciesController {
             @PathVariable final Long id,
             @Valid @RequestBody final SpeciesRequest speciesRequest) {
         log.info("Received request to update Species ID: {}", id);
-        return ResponseEntity.ok(speciesService.updateSpecies(id, speciesRequest));
+        SpeciesResponse updatedSpecies = speciesService.updateSpecies(id, speciesRequest);
+        return ResponseEntity.ok(updatedSpecies);
     }
 
     /**
@@ -65,7 +68,7 @@ public class SpeciesController {
      * @return HTTP 204 No Content
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSpecies(@PathVariable final long id) {
+    public ResponseEntity<Void> deleteSpecies(@PathVariable final Long id) {
         log.info("Received request to delete Species: {}", id);
         speciesService.deleteSpecies(id);
         return ResponseEntity.noContent().build();

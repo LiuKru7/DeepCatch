@@ -2,6 +2,7 @@ package finalProject.fishingLogTracker.fishingTracker.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ public record CatchRequest(
                 Boolean isReleased,
                 String description,
                 Long userId,
+                @NotNull
                 Double latitude,
                 Double longitude,
                 String country,

@@ -30,9 +30,9 @@ public class CatchController {
     /**
      * Creates a new catch entry with an attached photo.
      *
-     * @param user the authenticated user who submits the catch
+     * @param user         the authenticated user who submits the catch
      * @param catchRequest the data of the catch
-     * @param file the photo of the catch
+     * @param file         the photo of the catch
      * @return the created CatchResponse with HTTP 201 status
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -40,9 +40,14 @@ public class CatchController {
             @AuthenticationPrincipal final User user,
             @RequestPart("catch") final CatchRequest catchRequest,
             @RequestPart("file") final MultipartFile file) {
+
+        log.info("Received request to add catch with photo for user ID: {}", user.getId());
+
+        CatchResponse createdCatch = catchService.addCatchWithPhoto(catchRequest, file, user.getId());
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(catchService.addCatchWithPhoto(catchRequest, file, user.getId()));
+                .body(createdCatch);
     }
 
     /**
@@ -53,8 +58,12 @@ public class CatchController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CatchResponse> getCatchById(@PathVariable final Long id) {
+
         log.info("Received request to get Catch by ID: {}", id);
-        return ResponseEntity.ok(catchService.getCatchById(id));
+
+        CatchResponse catchResponse = catchService.getCatchById(id);
+
+        return ResponseEntity.ok(catchResponse);
     }
 
     /**
@@ -64,14 +73,18 @@ public class CatchController {
      */
     @GetMapping
     public ResponseEntity<List<CatchResponse>> getAllCatches() {
+
         log.info("Received request to get all Catches");
-        return ResponseEntity.ok(catchService.getAllCatches());
+
+        List<CatchResponse> catchResponses = catchService.getAllCatches();
+
+        return ResponseEntity.ok(catchResponses);
     }
 
     /**
      * Updates an existing catch entry.
      *
-     * @param id the ID of the catch to update
+     * @param id           the ID of the catch to update
      * @param catchRequest the updated catch data
      * @return the updated CatchResponse
      */
@@ -79,8 +92,12 @@ public class CatchController {
     public ResponseEntity<CatchResponse> updateCatch(
             @PathVariable final Long id,
             @Valid @RequestBody final CatchRequest catchRequest) {
+
         log.info("Received request to update Catch ID: {}", id);
-        return ResponseEntity.ok(catchService.updateCatch(id, catchRequest));
+
+        CatchResponse catchResponse = catchService.updateCatch(id, catchRequest);
+
+        return ResponseEntity.ok(catchResponse);
     }
 
     /**
@@ -104,8 +121,12 @@ public class CatchController {
      */
     @GetMapping("/fishing_style/{style}")
     public ResponseEntity<List<CatchResponse>> getCatchesByFishingStyle(@PathVariable final FishingStyle style) {
+
         log.info("Received request to get Catch by Fishing style: {}", style);
-        return ResponseEntity.ok(catchService.getCatchesByFishingStyle(style));
+
+        List<CatchResponse> catchResponses = catchService.getCatchesByFishingStyle(style);
+
+        return ResponseEntity.ok(catchResponses);
     }
 
     /**
@@ -116,8 +137,12 @@ public class CatchController {
      */
     @GetMapping("/user")
     public ResponseEntity<List<CatchResponse>> getUserCatches(@AuthenticationPrincipal final User user) {
+
         log.info("Received request to get catches for authenticated user");
-        return ResponseEntity.ok(catchService.getCatchesByUser(user.getId()));
+
+        List<CatchResponse> catchResponses = catchService.getCatchesByUser(user.getId());
+
+        return ResponseEntity.ok(catchResponses);
     }
 
     /**
@@ -128,7 +153,11 @@ public class CatchController {
      */
     @GetMapping("/user/{id}")
     public ResponseEntity<List<CatchResponse>> getCatchesByUserId(@PathVariable final Long id) {
+
         log.info("Received request to get Catch by ID: {}", id);
-        return ResponseEntity.ok(catchService.getCatchesByUserId(id));
+
+        List<CatchResponse> catchResponses = catchService.getCatchesByUserId(id);
+
+        return ResponseEntity.ok(catchResponses);
     }
 }
