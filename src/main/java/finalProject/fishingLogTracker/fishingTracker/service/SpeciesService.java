@@ -33,6 +33,14 @@ public class SpeciesService {
                 .toList();
     }
 
+    @Cacheable(value = "species", key = "#id")
+    public SpeciesResponse getSpeciesById(Long id) {
+        log.info("Fetching Species with ID: {}", id);
+        Species species = speciesRepository.findById(id)
+                .orElseThrow(() -> new SpeciesNotFoundException("Species not found with id: " + id));
+        return speciesMapper.toSpeciesResponse(species);
+    }
+
     @CacheEvict(value = "species", allEntries = true)
     public SpeciesResponse addNewSpecies(SpeciesRequest speciesRequest) {
         Species species = speciesRepository.save(speciesMapper.toSpecies(speciesRequest));

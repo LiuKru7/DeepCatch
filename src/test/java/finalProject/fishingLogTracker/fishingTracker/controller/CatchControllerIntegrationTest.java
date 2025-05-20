@@ -2,31 +2,30 @@ package finalProject.fishingLogTracker.fishingTracker.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import finalProject.fishingLogTracker.auth.model.User;
+import finalProject.fishingLogTracker.auth.repository.UserRepository;
+import finalProject.fishingLogTracker.auth.service.JwtService;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.CatchResponse;
+import finalProject.fishingLogTracker.fishingTracker.entity.*;
 import finalProject.fishingLogTracker.fishingTracker.enums.AquaticType;
 import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
-import finalProject.fishingLogTracker.fishingTracker.exception.CatchNotFoundException;
+import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
+import finalProject.fishingLogTracker.fishingTracker.repository.*;
 import finalProject.fishingLogTracker.fishingTracker.service.CatchService;
-import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import finalProject.fishingLogTracker.fishingTracker.enums.FishingStyle;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static finalProject.fishingLogTracker.auth.enums.Role.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,365 +34,508 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class CatchControllerIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private CatchService catchService;
+        @Autowired
+        private CatchService catchService;
 
-    private CatchResponse mockedCatch;
-    private CatchResponse mockedCatch2;
-    private List<CatchResponse> mockedCatchList;
-    private List<CatchResponse> spinningCatchList;
+        @Autowired
+        private CatchRepository catchRepository;
 
-    @BeforeEach
-    public void setup() {
+        @Autowired
+        private UserRepository userRepository;
 
-        mockedCatch = new CatchResponse(
-                1L,
-                10L,
-                "Trout",
-                "Lake",
-                "Salmo trutta",
-                AquaticType.RIVER,
-                FishingStyle.SPINNING,
-                "photo.jpg",
-                45.0,
-                3.2,
-                2L,
-                LocalDateTime.of(2024, 5, 19, 10, 30),
-                5L,
-                "Worm",
-                BaitType.MINNOW,
-                false,
-                "Nice catch, big fight!",
-                42L,
-                54.6872,
-                25.2797,
-                "Lithuania",
-                "Vilnius"
-        );
+        @Autowired
+        private SpeciesRepository speciesRepository;
 
-        mockedCatch2 = new CatchResponse(
-                2L,
-                10L,
-                "Pike",
-                "River",
-                "Esox lucius",
-                AquaticType.RIVER,
-                FishingStyle.SPINNING,
-                "pike.jpg",
-                55.0,
-                4.1,
-                3L,
-                LocalDateTime.of(2024, 5, 20, 12, 45),
-                7L,
-                "Spinner",
-                BaitType.SPINNER,
-                false,
-                "Great pike catch!",
-                43L,
-                54.7012,
-                25.2889,
-                "Lithuania",
-                "Vilnius"
-        );
+        @Autowired
+        private BaitRepository baitRepository;
 
-        mockedCatchList = List.of(mockedCatch, mockedCatch2);
-        spinningCatchList = List.of(mockedCatch, mockedCatch2);
-    }
+        @Autowired
+        private AquaticRepository aquaticRepository;
 
-    @Test
-    void addCatchWithPhoto_shouldReturnCreatedCatch() throws Exception {
+        @Autowired
+        private JwtService jwtService;
 
-        // Mock authenticated user
-        User mockUser = new User();
-        mockUser.setId(10L);
-        mockUser.setUsername("testuser");
-        mockUser.setRole(ROLE_USER);
+        @Autowired
+        private FriendshipRepository friendshipRepository;
 
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(mockUser, null, mockUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        private User testUser;
+        private Species testSpecies;
+        private Bait testBait;
+        private Aquatic testAquatic;
+        private String jwtToken;
 
-        CatchRequest catchRequest = new CatchRequest(
-                1L,
-                45.0,
-                3.2,
-                2L,
-                FishingStyle.SPINNING,
-                LocalDateTime.of(2024, 5, 19, 10, 30),
-                5L,
-                null,
-                false,
-                "Nice catch, big fight!",
-                42L,
-                54.6872,
-                25.2797,
-                "Lithuania",
-                "Vilnius"
-        );
+        @BeforeEach
+        void setUp() {
+                // Clean up existing data in correct order
+                catchRepository.deleteAll();
+                friendshipRepository.deleteAll(); // Delete friendships before users
+                speciesRepository.deleteAll();
+                baitRepository.deleteAll();
+                aquaticRepository.deleteAll();
+                userRepository.deleteAll();
 
+                // Create test user
+                testUser = new User();
+                testUser.setUsername("testuser");
+                testUser.setPassword("password");
+                testUser.setRole(ROLE_USER);
+                testUser = userRepository.save(testUser);
 
-        // Mock the JSON part
-        MockMultipartFile jsonPart = new MockMultipartFile(
-                "catch",
-                "catch.json",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(catchRequest)
-        );
+                // Generate JWT token for the test user
+                jwtToken = jwtService.generateToken(testUser);
 
-        // Mock the file part
-        MockMultipartFile filePart = new MockMultipartFile(
-                "file",
-                "photo.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "dummy image content".getBytes()
-        );
+                // Create test species
+                testSpecies = new Species("Trout", "Salmo trutta");
+                testSpecies = speciesRepository.save(testSpecies);
 
-        Mockito.when(catchService.addNewCatch(
-                Mockito.any(CatchRequest.class),
-                Mockito.any(MultipartFile.class),
-                Mockito.eq(mockUser.getId())
-        )).thenReturn(mockedCatch);
+                // Create test bait
+                testBait = new Bait();
+                testBait.setBaitType(BaitType.MINNOW);
+                testBait.setDescription("Worm");
+                testBait = baitRepository.save(testBait);
 
-        MvcResult result = mockMvc.perform(multipart("/api/catch")
-                        .file(jsonPart)
-                        .file(filePart)
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
+                // Create test aquatic
+                testAquatic = new Aquatic("Test Lake", AquaticType.LAKE);
+                testAquatic = aquaticRepository.save(testAquatic);
+        }
 
-        CatchResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                CatchResponse.class
-        );
+        @AfterEach
+        void tearDown() {
+                // Clean up after each test in correct order
+                catchRepository.deleteAll();
+                friendshipRepository.deleteAll(); // Delete friendships before users
+                speciesRepository.deleteAll();
+                baitRepository.deleteAll();
+                aquaticRepository.deleteAll();
+                userRepository.deleteAll();
+        }
 
-        assertThat(response.id()).isEqualTo(mockedCatch.id());
-        assertThat(response.speciesName()).isEqualTo("Trout");
+        @Test
+        void addCatchWithPhoto_shouldReturnCreatedCatch() throws Exception {
+                // Given
+                CatchRequest catchRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Nice catch, big fight!",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        SecurityContextHolder.clearContext();
-    }
+                // Mock the JSON part
+                MockMultipartFile jsonPart = new MockMultipartFile(
+                                "catch",
+                                "catch.json",
+                                MediaType.APPLICATION_JSON_VALUE,
+                                objectMapper.writeValueAsBytes(catchRequest));
 
-    @Test
-    void getCatchById_shouldReturnCatch() throws Exception {
+                // Mock the file part
+                MockMultipartFile filePart = new MockMultipartFile(
+                                "file",
+                                "photo.jpg",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "dummy image content".getBytes());
 
-        Mockito.when(catchService.getCatchById(1L)).thenReturn(mockedCatch);
+                // When
+                MvcResult result = mockMvc.perform(multipart("/api/catch")
+                                .file(jsonPart)
+                                .file(filePart)
+                                .header("Authorization", "Bearer " + jwtToken)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .accept(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isCreated())
+                                .andReturn();
 
-        MvcResult result = mockMvc.perform(get("/api/catch/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+                // Then
+                CatchResponse response = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                CatchResponse.class);
 
-        CatchResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                CatchResponse.class
-        );
+                assertThat(response.speciesName()).isEqualTo("Trout");
+                assertThat(response.size()).isEqualTo(45.0);
+                assertThat(response.weight()).isEqualTo(3.2);
+                assertThat(response.fishingStyle()).isEqualTo(FishingStyle.SPINNING);
+                assertThat(response.userId()).isEqualTo(testUser.getId());
 
-        assertThat(response.id()).isEqualTo(1L);
-        assertThat(response.speciesName()).isEqualTo("Trout");
-    }
+                // Verify database state
+                assertThat(catchRepository.findAll()).hasSize(1);
+                assertThat(catchRepository.findAll().get(0).getUser().getId()).isEqualTo(testUser.getId());
+        }
 
-    @Test
-    void getAllCatches_shouldReturnListOfCatches() throws Exception {
+        @Test
+        void getCatchById_shouldReturnCatch() throws Exception {
+                // Given
+                CatchRequest catchRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Nice catch, big fight!",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        Mockito.when(catchService.getAllCatches()).thenReturn(mockedCatchList);
+                CatchResponse createdCatch = catchService.addNewCatch(
+                                catchRequest,
+                                new MockMultipartFile("file", "photo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
 
-        MvcResult result = mockMvc.perform(get("/api/catch")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+                // When
+                MvcResult result = mockMvc.perform(get("/api/catch/{id}", createdCatch.id())
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-        CatchResponse[] responses = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                CatchResponse[].class
-        );
+                // Then
+                CatchResponse response = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                CatchResponse.class);
 
-        assertThat(responses).hasSize(2);
-        assertThat(responses[0].id()).isEqualTo(1);
-    }
+                assertThat(response.id()).isEqualTo(createdCatch.id());
+                assertThat(response.speciesName()).isEqualTo("Trout");
+                assertThat(response.size()).isEqualTo(45.0);
+        }
 
-    @Test
-    void updateCatch_shouldReturnUpdatedCatch() throws Exception {
+        @Test
+        void getAllCatches_shouldReturnListOfCatches() throws Exception {
+                // Given
+                CatchRequest catchRequest1 = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "First catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        CatchRequest updateRequest = new CatchRequest(
-                1L,
-                50.0,
-                3.5,
-                2L,
-                FishingStyle.FLY_FISHING,
-                LocalDateTime.of(2024, 5, 20, 14, 15), // updated date
-                6L,
-                null,
-                false,
-                "Updated description - even bigger fight!",
-                42L,
-                54.6872,
-                25.2797,
-                "Lithuania",
-                "Vilnius"
-        );
+                CatchRequest catchRequest2 = new CatchRequest(
+                                testSpecies.getId(),
+                                50.0,
+                                4.0,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 20, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Second catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        CatchResponse updatedResponse = new CatchResponse(
-                1L,
-                10L,
-                "Trout",
-                "Lake",
-                "Salmo trutta",
-                AquaticType.RIVER,
-                FishingStyle.FLY_FISHING,
-                "photo.jpg",
-                50.0,
-                3.5,
-                2L,
-                LocalDateTime.of(2024, 5, 20, 14, 15),
-                6L,
-                "Dry fly",
-                BaitType.FLY,
-                false,
-                "Updated description - even bigger fight!",
-                42L,
-                54.6872,
-                25.2797,
-                "Lithuania",
-                "Vilnius"
-        );
+                catchService.addNewCatch(
+                                catchRequest1,
+                                new MockMultipartFile("file", "photo1.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
+                catchService.addNewCatch(
+                                catchRequest2,
+                                new MockMultipartFile("file", "photo2.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
 
-        Mockito.when(catchService.updateCatch(
-                Mockito.eq(1L),
-                Mockito.any(CatchRequest.class))
-        ).thenReturn(updatedResponse);
+                // When
+                MvcResult result = mockMvc.perform(get("/api/catch")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-        MvcResult result = mockMvc.perform(put("/api/catch/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
+                // Then
+                CatchResponse[] responses = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                CatchResponse[].class);
 
-        CatchResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                CatchResponse.class
-        );
+                assertThat(responses).hasSize(2);
+                assertThat(responses[0].size()).isEqualTo(45.0);
+                assertThat(responses[1].size()).isEqualTo(50.0);
+        }
 
-        assertThat(response.weight()).isEqualTo(3.5);
-        assertThat(response.size()).isEqualTo(50.0);
-        assertThat(response.fishingStyle()).isEqualTo(FishingStyle.FLY_FISHING);
-        assertThat(response.baitType()).isEqualTo(BaitType.FLY);
+        @Test
+        void updateCatch_shouldReturnUpdatedCatch() throws Exception {
+                // Given
+                CatchRequest initialRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Initial catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-    }
+                CatchResponse createdCatch = catchService.addNewCatch(
+                                initialRequest,
+                                new MockMultipartFile("file", "photo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
 
-    @Test
-    void deleteCatch_shouldDeleteCatchById() throws Exception {
+                CatchRequest updateRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                50.0,
+                                4.0,
+                                testAquatic.getId(),
+                                FishingStyle.FLY_FISHING,
+                                LocalDateTime.of(2024, 5, 20, 14, 15),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Updated catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        Mockito.doNothing().when(catchService).deleteCatch(1L);
+                // When
+                MvcResult result = mockMvc.perform(put("/api/catch/{id}", createdCatch.id())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-        mockMvc.perform(delete("/api/catch/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                // Then
+                CatchResponse response = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                CatchResponse.class);
 
-        Mockito.verify(catchService, Mockito.times(1)).deleteCatch(1L);
-    }
+                assertThat(response.id()).isEqualTo(createdCatch.id());
+                assertThat(response.size()).isEqualTo(50.0);
+                assertThat(response.weight()).isEqualTo(4.0);
+                assertThat(response.fishingStyle()).isEqualTo(FishingStyle.FLY_FISHING);
+                assertThat(response.description()).isEqualTo("Updated catch");
 
-    @Test
-    void getCatchesByFishingStyle_shouldReturnListOfCatches() throws Exception {
+                // Verify database state
+                assertThat(catchRepository.findById(createdCatch.id()))
+                                .isPresent()
+                                .hasValueSatisfying(catchEntity -> {
+                                        assertThat(catchEntity.getSize()).isEqualTo(50.0);
+                                        assertThat(catchEntity.getWeight()).isEqualTo(4.0);
+                                });
+        }
 
-        Mockito.when(catchService.getCatchesByFishingStyle(FishingStyle.SPINNING))
-                .thenReturn(spinningCatchList);
+        @Test
+        void deleteCatch_shouldDeleteCatchById() throws Exception {
+                // Given
+                CatchRequest catchRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Nice catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        MvcResult result = mockMvc.perform(get("/api/catch/fishing_style/{style}", FishingStyle.SPINNING)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+                CatchResponse createdCatch = catchService.addNewCatch(
+                                catchRequest,
+                                new MockMultipartFile("file", "photo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
 
-        CatchResponse[] responses = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                CatchResponse[].class
-        );
+                // When
+                mockMvc.perform(delete("/api/catch/{id}", createdCatch.id())
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isNoContent());
 
-        assertThat(responses).hasSize(2);
-        assertThat(responses[0].fishingStyle()).isEqualTo(FishingStyle.SPINNING);
-        assertThat(responses[1].fishingStyle()).isEqualTo(FishingStyle.SPINNING);
-        assertThat(responses[0].speciesName()).isEqualTo("Trout");
-        assertThat(responses[1].speciesName()).isEqualTo("Pike");
-    }
+                // Then
+                assertThat(catchRepository.findById(createdCatch.id())).isEmpty();
+        }
 
-    @Test
-    void getUserCatches_shouldReturnUserCatches() throws Exception {
+        @Test
+        void getCatchesByFishingStyle_shouldReturnListOfCatches() throws Exception {
+                // Given
+                CatchRequest catchRequest1 = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Spinning catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        // Create a mock User object
-        User mockUser = new User();
-        mockUser.setId(42L);
-        mockUser.setUsername("testuser");
-        mockUser.setRole(ROLE_USER);
+                CatchRequest catchRequest2 = new CatchRequest(
+                                testSpecies.getId(),
+                                50.0,
+                                4.0,
+                                testAquatic.getId(),
+                                FishingStyle.FLY_FISHING,
+                                LocalDateTime.of(2024, 5, 20, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "Fly fishing catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        // Create authentication with the mock user
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(mockUser, null, mockUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+                catchService.addNewCatch(
+                                catchRequest1,
+                                new MockMultipartFile("file", "photo1.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
+                catchService.addNewCatch(
+                                catchRequest2,
+                                new MockMultipartFile("file", "photo2.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
 
-        Mockito.when(catchService.getCatchesByUser(42L))
-                .thenReturn(mockedCatchList);
+                // When
+                MvcResult result = mockMvc.perform(get("/api/catch/fishing_style/{style}", FishingStyle.SPINNING)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-        MvcResult result = mockMvc.perform(get("/api/catch/user")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+                // Then
+                CatchResponse[] responses = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                CatchResponse[].class);
 
-        CatchResponse[] responses = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                CatchResponse[].class
-        );
+                assertThat(responses).hasSize(1);
+                assertThat(responses[0].fishingStyle()).isEqualTo(FishingStyle.SPINNING);
+                assertThat(responses[0].size()).isEqualTo(45.0);
+        }
 
-        assertThat(responses).hasSize(2);
-        assertThat(responses[0].userId()).isEqualTo(42L);
-        assertThat(responses[1].userId()).isEqualTo(43L);
-        assertThat(responses[0].speciesName()).isEqualTo("Trout");
-        assertThat(responses[1].speciesName()).isEqualTo("Pike");
+        @Test
+        void getUserCatches_shouldReturnUserCatches() throws Exception {
+                // Given
+                CatchRequest catchRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                45.0,
+                                3.2,
+                                testAquatic.getId(),
+                                FishingStyle.SPINNING,
+                                LocalDateTime.of(2024, 5, 19, 10, 30),
+                                testBait.getId(),
+                                null,
+                                false,
+                                "User's catch",
+                                testUser.getId(),
+                                54.6872,
+                                25.2797,
+                                "Lithuania",
+                                "Vilnius");
 
-        SecurityContextHolder.clearContext();
-    }
+                // Create the catch through the service
+                CatchResponse createdCatch = catchService.addNewCatch(
+                                catchRequest,
+                                new MockMultipartFile("file", "photo.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                                "dummy".getBytes()),
+                                testUser.getId());
 
-    @Test
-    void getCatchById_shouldReturnNotFound_whenCatchDoesNotExist() throws Exception {
-        Long nonExistentId = 999L;
+                // Verify the catch was created
+                assertThat(catchRepository.findById(createdCatch.id())).isPresent();
+                assertThat(catchRepository.findByUserId(testUser.getId())).hasSize(1);
 
-        Mockito.when(catchService.getCatchById(nonExistentId))
-                .thenThrow(new CatchNotFoundException("Catch not found"));
+                // When
+                MvcResult result = mockMvc.perform(get("/api/catch/user")
+                                .header("Authorization", "Bearer " + jwtToken)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-        mockMvc.perform(get("/api/catch/{id}", nonExistentId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
+                // Then
+                CatchResponse[] responses = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                CatchResponse[].class);
 
-    @Test
-    void updateCatch_shouldReturnBadRequest_whenDataIsInvalid() throws Exception {
-        CatchRequest invalidRequest = new CatchRequest(
-                1L,
-                null,
-                null,
-                null,
-                FishingStyle.FLY_FISHING,
-                LocalDateTime.of(2024, 5, 20, 14, 15),
-                null,
-                null,
-                false,
-                "Updated description - even bigger fight!",
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+                assertThat(responses).hasSize(1);
+                assertThat(responses[0].userId()).isEqualTo(testUser.getId());
+                assertThat(responses[0].speciesName()).isEqualTo("Trout");
+                assertThat(responses[0].size()).isEqualTo(45.0);
+                assertThat(responses[0].weight()).isEqualTo(3.2);
+        }
 
-        mockMvc.perform(put("/api/catch/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-    }
+        @Test
+        void getCatchById_shouldReturnNotFound_whenCatchDoesNotExist() throws Exception {
+                // When/Then
+                mockMvc.perform(get("/api/catch/{id}", 999L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void updateCatch_shouldReturnBadRequest_whenDataIsInvalid() throws Exception {
+                // Given
+                CatchRequest invalidRequest = new CatchRequest(
+                                testSpecies.getId(),
+                                null,
+                                null,
+                                null,
+                                FishingStyle.FLY_FISHING,
+                                LocalDateTime.of(2024, 5, 20, 14, 15),
+                                null,
+                                null,
+                                false,
+                                "Invalid catch",
+                                testUser.getId(),
+                                null,
+                                null,
+                                null,
+                                null);
+
+                // When/Then
+                mockMvc.perform(put("/api/catch/{id}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidRequest)))
+                                .andExpect(status().isBadRequest());
+        }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/friendship")
 @RequiredArgsConstructor
@@ -29,7 +30,8 @@ public class FriendshipController {
     @GetMapping("/friends")
     public ResponseEntity<List<UserResponse>> getMyFriends(@AuthenticationPrincipal User user) {
         log.info("User {} requested their friends list", user.getId());
-        return ResponseEntity.ok(friendshipService.getFriends(user.getId()));
+        List<UserResponse> friendList = friendshipService.getFriends(user.getId());
+        return ResponseEntity.ok(friendList);
     }
 
     /**
@@ -41,13 +43,14 @@ public class FriendshipController {
     @GetMapping("/userlist")
     public ResponseEntity<List<String>> getAllUsers(@AuthenticationPrincipal User user) {
         log.info("User {} requested user list", user.getId());
-        return ResponseEntity.ok(friendshipService.getAllUsers(user.getId()));
+        List<String> allUsers = friendshipService.getAllUsers(user.getId());
+        return ResponseEntity.ok(allUsers);
     }
 
     /**
      * Sends a friendship request to another user by username.
      *
-     * @param user the authenticated user
+     * @param user     the authenticated user
      * @param username the username to send a request to
      * @return response with friendship request details
      */
@@ -56,8 +59,8 @@ public class FriendshipController {
             @AuthenticationPrincipal User user,
             @RequestBody String username) {
         log.info("User {} is sending a friend request to '{}'", user.getId(), username);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(friendshipService.sentFriendshipRequest(user.getId(), username));
+        FriendshipResponse addedFriend = friendshipService.sentFriendshipRequest(user.getId(), username);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addedFriend);
     }
 
     /**
@@ -69,7 +72,8 @@ public class FriendshipController {
     @GetMapping("/received")
     public ResponseEntity<List<UserResponse>> getPendingRequestsReceived(@AuthenticationPrincipal User user) {
         log.info("User {} requested received friendship requests", user.getId());
-        return ResponseEntity.ok(friendshipService.getPendingRequestsReceived(user.getId()));
+        List<UserResponse> pendingRequestsReceived = friendshipService.getPendingRequestsReceived(user.getId());
+        return ResponseEntity.ok(pendingRequestsReceived);
     }
 
     /**
@@ -81,13 +85,14 @@ public class FriendshipController {
     @GetMapping("/sent")
     public ResponseEntity<List<UserResponse>> getPendingRequestsSent(@AuthenticationPrincipal User user) {
         log.info("User {} requested sent friendship requests", user.getId());
-        return ResponseEntity.ok(friendshipService.getPendingRequestsSent(user.getId()));
+        List<UserResponse> pendingRequestsSent = friendshipService.getPendingRequestsSent(user.getId());
+        return ResponseEntity.ok(pendingRequestsSent);
     }
 
     /**
      * Accepts a friendship request from another user.
      *
-     * @param user the authenticated user
+     * @param user     the authenticated user
      * @param friendId the ID of the user whose request is being accepted
      * @return details of the accepted friendship
      */
@@ -96,14 +101,14 @@ public class FriendshipController {
             @AuthenticationPrincipal User user,
             @RequestBody Long friendId) {
         log.info("User {} accepted friendship request from user {}", user.getId(), friendId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(friendshipService.acceptRequest(user.getId(), friendId));
+        FriendshipResponse acceptedRequest = friendshipService.acceptRequest(user.getId(), friendId);
+        return ResponseEntity.status(HttpStatus.OK).body(acceptedRequest);
     }
 
     /**
      * Removes a user from the authenticated user's friend list.
      *
-     * @param user the authenticated user
+     * @param user     the authenticated user
      * @param friendId the ID of the friend to remove
      * @return HTTP 204 No Content on success
      */

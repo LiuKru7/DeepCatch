@@ -3,155 +3,187 @@ package finalProject.fishingLogTracker.fishingTracker.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import finalProject.fishingLogTracker.fishingTracker.dto.SpeciesRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.SpeciesResponse;
-import finalProject.fishingLogTracker.fishingTracker.exception.SpeciesNotFoundException;
+import finalProject.fishingLogTracker.fishingTracker.repository.CatchRepository;
 import finalProject.fishingLogTracker.fishingTracker.service.SpeciesService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class SpeciesControllerIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private SpeciesService speciesService;
+        @Autowired
+        private SpeciesService speciesService;
 
-    @Test
-    void getAllSpecies_shouldReturnListOfSpecies() throws Exception {
-        List<SpeciesResponse> mockResponse = List.of(
-                new SpeciesResponse(1L, "Catfish", "kitinelis didziulis"),
-                new SpeciesResponse(2L, "Carp", "karpis rafailas")
-        );
-        Mockito.when(speciesService.getAllSpecies()).thenReturn(mockResponse);
+        @Autowired
+        private CatchRepository catchRepository;
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/api/species")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        @BeforeEach
+        void setUp() {
+                // Clean up any existing data
+                catchRepository.deleteAll(); // Delete catches first
+                speciesService.getAllSpecies().forEach(species -> speciesService.deleteSpecies(species.id()));
+        }
 
-        SpeciesResponse[] responses = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                SpeciesResponse[].class
-        );
+        @AfterEach
+        void tearDown() {
+                // Clean up after each test
+                catchRepository.deleteAll(); // Delete catches first
+                speciesService.getAllSpecies().forEach(species -> speciesService.deleteSpecies(species.id()));
+        }
 
-        assertThat(responses).hasSize(2);
-        assertThat(responses[0].name()).isEqualTo("Catfish");
-        assertThat(responses[0].latinName()).isEqualTo("kitinelis didziulis");
-        assertThat(responses[1].name()).isEqualTo("Carp");
-        assertThat(responses[1].latinName()).isEqualTo("karpis rafailas");
-    }
+        @Test
+        @WithMockUser(roles = "USER")
+        void getAllSpecies_shouldReturnListOfSpecies() throws Exception {
+                // Given
+                SpeciesRequest species1 = new SpeciesRequest("Catfish", "kitinelis didziulis");
+                SpeciesRequest species2 = new SpeciesRequest("Carp", "karpis rafailas");
+                speciesService.addNewSpecies(species1);
+                speciesService.addNewSpecies(species2);
 
-    @Test
-    void addNewSpecies_shouldReturnCreatedSpecies() throws Exception {
-        SpeciesRequest speciesRequest = new SpeciesRequest("White Perch", "percas albinosas");
-        SpeciesResponse mockResponse = new SpeciesResponse(3L, "White Perch", "percas albinosas");
+                // When
+                MvcResult result = mockMvc.perform(get("/api/species")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-        Mockito.when(speciesService.addNewSpecies(Mockito.any(SpeciesRequest.class)))
-                .thenReturn(mockResponse);
+                // Then
+                SpeciesResponse[] responses = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                SpeciesResponse[].class);
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/species")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(speciesRequest)))
-                .andExpect(status().isCreated())
-                .andReturn();
+                assertThat(responses).hasSize(2);
+                assertThat(responses).extracting("name").containsExactlyInAnyOrder("Catfish", "Carp");
+                assertThat(responses).extracting("latinName").containsExactlyInAnyOrder("kitinelis didziulis",
+                                "karpis rafailas");
+        }
 
-        SpeciesResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                SpeciesResponse.class
-        );
+        @Test
+        @WithMockUser(roles = "USER")
+        void addNewSpecies_shouldReturnCreatedSpecies() throws Exception {
+                // Given
+                SpeciesRequest speciesRequest = new SpeciesRequest("White Perch", "percas albinosas");
 
-        assertThat(response.id()).isEqualTo(3L);
-        assertThat(response.name()).isEqualTo("White Perch");
-        assertThat(response.latinName()).isEqualTo("percas albinosas");
-    }
+                // When
+                MvcResult result = mockMvc.perform(post("/api/species")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(speciesRequest)))
+                                .andExpect(status().isCreated())
+                                .andReturn();
 
-    @Test
-    void updateSpecies_shouldReturnUpdatedSpecies() throws Exception {
-        Long id = 3L;
-        SpeciesRequest updateRequest = new SpeciesRequest("Updated white Perch", "percas albinosas updeitas");
-        SpeciesResponse updatedResponse = new SpeciesResponse(id, "Updated white Perch", "percas albinosas updeitas");
+                // Then
+                SpeciesResponse response = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                SpeciesResponse.class);
 
-        Mockito.when(speciesService.updateSpecies(Mockito.eq(id), Mockito.any(SpeciesRequest.class)))
-                .thenReturn(updatedResponse);
+                assertThat(response.name()).isEqualTo("White Perch");
+                assertThat(response.latinName()).isEqualTo("percas albinosas");
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/species/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
+                // Verify database state
+                assertThat(speciesService.getAllSpecies())
+                                .hasSize(1)
+                                .first()
+                                .satisfies(savedSpecies -> {
+                                        assertThat(savedSpecies.name()).isEqualTo("White Perch");
+                                        assertThat(savedSpecies.latinName()).isEqualTo("percas albinosas");
+                                });
+        }
 
-        SpeciesResponse response = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                SpeciesResponse.class
-        );
+        @Test
+        @WithMockUser(roles = "USER")
+        void updateSpecies_shouldReturnUpdatedSpecies() throws Exception {
+                // Given
+                SpeciesRequest initialRequest = new SpeciesRequest("White Perch", "percas albinosas");
+                SpeciesResponse createdSpecies = speciesService.addNewSpecies(initialRequest);
 
-        assertThat(response.id()).isEqualTo(id);
-        assertThat(response.name()).isEqualTo("Updated white Perch");
-        assertThat(response.latinName()).isEqualTo("percas albinosas updeitas");
+                SpeciesRequest updateRequest = new SpeciesRequest("Updated white Perch", "percas albinosas updeitas");
 
-    }
+                // When
+                MvcResult result = mockMvc.perform(put("/api/species/{id}", createdSpecies.id())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                                .andExpect(status().isOk())
+                                .andReturn();
 
-    @Test
-    void deleteSpecies_shouldDeleteSpeciesById() throws Exception {
-        Long id = 3L;
+                // Then
+                SpeciesResponse response = objectMapper.readValue(
+                                result.getResponse().getContentAsString(),
+                                SpeciesResponse.class);
 
-        Mockito.doNothing().when(speciesService).deleteSpecies(id);
+                assertThat(response.id()).isEqualTo(createdSpecies.id());
+                assertThat(response.name()).isEqualTo("Updated white Perch");
+                assertThat(response.latinName()).isEqualTo("percas albinosas updeitas");
 
-        mockMvc.perform(delete("/api/species/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                // Verify database state
+                assertThat(speciesService.getAllSpecies())
+                                .hasSize(1)
+                                .first()
+                                .satisfies(updatedSpecies -> {
+                                        assertThat(updatedSpecies.name()).isEqualTo("Updated white Perch");
+                                        assertThat(updatedSpecies.latinName()).isEqualTo("percas albinosas updeitas");
+                                });
+        }
 
-        Mockito.verify(speciesService, Mockito.times(1)).deleteSpecies(id);
-    }
+        @Test
+        @WithMockUser(roles = "USER")
+        void deleteSpecies_shouldDeleteSpeciesById() throws Exception {
+                // Given
+                SpeciesRequest speciesRequest = new SpeciesRequest("White Perch", "percas albinosas");
+                SpeciesResponse createdSpecies = speciesService.addNewSpecies(speciesRequest);
 
-    @Test
-    void addNewSpecies_shouldReturnBadRequest_whenInvalidInput() throws Exception {
-        SpeciesRequest invalidRequest = new SpeciesRequest("", "");
+                // When
+                mockMvc.perform(delete("/api/species/{id}", createdSpecies.id())
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isNoContent());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/species")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
+                // Then
+                assertThat(speciesService.getAllSpecies()).isEmpty();
+        }
 
-    }
+        @Test
+        @WithMockUser(roles = "USER")
+        void addNewSpecies_shouldReturnBadRequest_whenInvalidInput() throws Exception {
+                // Given
+                SpeciesRequest invalidRequest = new SpeciesRequest("", "");
 
-    @Test
-    void updateSpecies_shouldReturnNotFound_whenSpeciesDoesNotExist() throws Exception {
-        Long badId = 999L;
+                // When/Then
+                mockMvc.perform(post("/api/species")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidRequest)))
+                                .andExpect(status().isBadRequest());
+        }
 
-        SpeciesRequest updateRequest = new SpeciesRequest("Crazy Fish", "carpis pamiselis");
+        @Test
+        @WithMockUser(roles = "USER")
+        void updateSpecies_shouldReturnNotFound_whenSpeciesDoesNotExist() throws Exception {
+                // Given
+                Long nonExistentId = 999L;
+                SpeciesRequest updateRequest = new SpeciesRequest("Crazy Fish", "carpis pamiselis");
 
-        Mockito.when(speciesService.updateSpecies(Mockito.eq(badId), Mockito.any(SpeciesRequest.class)))
-                .thenThrow(new SpeciesNotFoundException("Species not found with id: " + badId));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/species/{id}", badId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Species not found with id: " + badId));
-    }
-
+                // When/Then
+                mockMvc.perform(put("/api/species/{id}", nonExistentId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                                .andExpect(status().isNotFound());
+        }
 }
