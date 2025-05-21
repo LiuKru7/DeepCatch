@@ -4,6 +4,7 @@ import finalProject.fishingLogTracker.auth.model.User;
 import finalProject.fishingLogTracker.fishingTracker.dto.UpdateProfileRequest;
 import finalProject.fishingLogTracker.fishingTracker.dto.UserResponse;
 import finalProject.fishingLogTracker.fishingTracker.service.ProfileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,8 +32,7 @@ public class ProfileController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> changeProfilePhoto(
             @AuthenticationPrincipal final User user,
-            @RequestPart("file") final MultipartFile file
-    ) {
+            @RequestPart("file") final MultipartFile file) {
         log.info("User {} is updating profile photo", user.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -54,16 +54,15 @@ public class ProfileController {
     /**
      * Updates the profile data of the authenticated user.
      *
-     * @param user the authenticated user
+     * @param user    the authenticated user
      * @param request the updated profile data
      * @return the updated UserResponse
      */
     @PutMapping("/update")
     public ResponseEntity<UserResponse> updateProfile(
             @AuthenticationPrincipal final User user,
-            @RequestBody final UpdateProfileRequest request) {
+            @Valid @RequestBody final UpdateProfileRequest request) {
         log.info("User {} is updating profile info", user.getId());
         return ResponseEntity.ok(profileService.updateProfile(user.getId(), request));
     }
 }
-
