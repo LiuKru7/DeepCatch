@@ -2,10 +2,11 @@ package finalProject.fishingLogTracker.fishingTracker.dto;
 
 import finalProject.fishingLogTracker.fishingTracker.enums.BaitType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public record BaitRequest (
-        @Schema(implementation = BaitType.class)
-        BaitType baitType,
-        String description
-){
+public record BaitRequest(
+                @NotNull(message = "Bait type must not be null") @Schema(implementation = BaitType.class) BaitType baitType,
+
+                @NotBlank(message = "Description must not be blank") String description) {
 }
