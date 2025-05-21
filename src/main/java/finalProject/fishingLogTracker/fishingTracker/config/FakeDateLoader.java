@@ -25,11 +25,9 @@ public class FakeDateLoader implements CommandLineRunner {
     private final BaitRepository baitRepository;
     private final CatchRepository catchRepository;
     private final UserRepository userRepository;
-    private final FriendshipRepository friendshipRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        // Get the existing user with better error handling
         User existingUser = userRepository.findByUsername("user")
                 .orElseThrow(() -> new IllegalStateException(
                         "User 'user' not found. Make sure auth.FakeDataLoader runs first."));

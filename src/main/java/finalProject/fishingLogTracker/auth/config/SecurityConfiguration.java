@@ -1,8 +1,9 @@
 package finalProject.fishingLogTracker.auth.config;
 
-
 import finalProject.fishingLogTracker.auth.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -21,50 +22,81 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+/**
+ * Security configuration class for the application.
+ * Configures CORS, CSRF, session management, request authorization, and JWT filtering.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@Slf4j
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFiler;
     private final AuthenticationProvider authenticationProvider;
 
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
+
+    /**
+     * Defines the security filter chain with CORS, CSRF disabled, stateless session,
+     * request authorization rules, and JWT authentication filter.
+     *
+     * @param http the HttpSecurity configuration object
+     * @return the configured SecurityFilterChain
+     * @throws Exception if security configuration fails
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {  // Configures the security filter chain
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring security filter chain");
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)  // Disables CSRF protection (common for REST APIs)
-                .authorizeHttpRequests(auth -> auth  // Starts request authorization configuration
-                                .requestMatchers("/api/**").permitAll()
-                                .requestMatchers("/api/uploads/**").permitAll()
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**").permitAll()
-                                .requestMatchers("/swagger-ui.html").permitAll()
-                                .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/ws/**").permitAll()
-//                        .requestMatchers("/api/catch/**").permitAll()
-//                        .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/carparts/user/**").hasAnyAuthority("ROLE_ADMIN","ROLE_USER")
-//                        .requestMatchers("/api/carparts/admin/**").hasAnyAuthority("ROLE_ADMIN")
-//                        .requestMatchers("/api/supplier/admin/**").hasAnyAuthority("ROLE_ADMIN")
-                                .anyRequest().authenticated()
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/uploads/**",
+                                "/h2-console/**",
+                                "/ws/**",
+                                "/api/catch/**",
+                                "/api/auth/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).hasAuthority("ROLE_ADMIN")
+
+                        .requestMatchers("/api/supplier/admin/**").hasAuthority("ROLE_ADMIN")
+                        .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(Customizer.withDefaults())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFiler, UsernamePasswordAuthenticationFilter.class);
 
-        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));// Adds JWT filter before the standard username/password filter
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
+        log.info("Security filter chain configured successfully");
         return http.build();
     }
 
+    /**
+     * Defines the CORS configuration source, allowing cross-origin requests
+     * from the configured origins.
+     *
+     * @return the CorsConfigurationSource object
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        log.info("Configuring CORS with allowed origins: {}", allowedOrigins);
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
@@ -73,5 +105,4 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }
