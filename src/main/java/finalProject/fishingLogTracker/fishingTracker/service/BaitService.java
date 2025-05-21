@@ -27,7 +27,6 @@ public class BaitService {
 
     @Cacheable("baits")
     public List<BaitResponse> getAllBaits() {
-        System.out.println("YRA YRA YRA YRA YRA YRA YRA YRA");
         return baitRepository.findAll().stream()
                 .map(baitMapper::toBaitResponse)
                 .toList();
