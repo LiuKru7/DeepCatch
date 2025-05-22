@@ -18,12 +18,15 @@ public class ProfileService {
     private final UserMapper userMapper;
 
     public UserResponse changeProfilePhoto(Long id, MultipartFile file) {
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         String url = imageService.saveFile(file);
         user.setPhotoUrl(url);
-        return userMapper.toUserDto(userRepository.save(user));
 
+        return userMapper.toUserDto(userRepository.save(user));
     }
+
 
     public UserResponse getProfileInfo(Long id) {
         return userMapper.toUserDto(userRepository
