@@ -56,7 +56,7 @@ class SpeciesControllerIntegrationTest {
         @WithMockUser(roles = "USER")
         void getAllSpecies_shouldReturnListOfSpecies() throws Exception {
                 // Given
-                SpeciesRequest species1 = new SpeciesRequest("Catfish", "kitinelis didziulis");
+                SpeciesRequest species1 = new SpeciesRequest("Catfish", "katinelis didziulis");
                 SpeciesRequest species2 = new SpeciesRequest("Carp", "karpis rafailas");
                 speciesService.addNewSpecies(species1);
                 speciesService.addNewSpecies(species2);
@@ -74,7 +74,7 @@ class SpeciesControllerIntegrationTest {
 
                 assertThat(responses).hasSize(2);
                 assertThat(responses).extracting("name").containsExactlyInAnyOrder("Catfish", "Carp");
-                assertThat(responses).extracting("latinName").containsExactlyInAnyOrder("kitinelis didziulis",
+                assertThat(responses).extracting("latinName").containsExactlyInAnyOrder("katinelis didziulis",
                                 "karpis rafailas");
         }
 

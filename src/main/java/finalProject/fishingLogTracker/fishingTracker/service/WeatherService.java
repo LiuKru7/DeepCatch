@@ -24,7 +24,6 @@ public class WeatherService {
     // RestTemplate is used for making HTTP requests
     private final RestTemplate restTemplate = new RestTemplate();
 
-
     @Value("${weather.api.key}")
     private String apiKey;
 
@@ -35,8 +34,7 @@ public class WeatherService {
         // Format the URL using the API base URL, latitude, longitude, and API key
         String urlString = String.format(
                 "%s?lat=%s&lon=%s&units=metric&appid=%s",
-                apiUrl, latitude, longitude, apiKey
-        );
+                apiUrl, latitude, longitude, apiKey);
 
         try {
             log.info("Fetching weather data from URL: {}", urlString);
@@ -54,13 +52,14 @@ public class WeatherService {
 
             // Create and populate the Weather object from the JSON response
             Weather weather = new Weather();
-            weather.setTemperature(root.path("main").path("temp").asDouble());  // Temperature in Celsius
-            weather.setFeelsLike(root.path("main").path("feels_like").asDouble());  // "Feels like" temperature
-            weather.setHumidity(root.path("main").path("humidity").asDouble());  // Humidity in percentage
-            weather.setCondition(root.path("weather").get(0).path("description").asText());  // Weather description (e.g., "clear sky")
-            weather.setWindSpeed(root.path("wind").path("speed").asDouble());  // Wind speed (m/s)
-            weather.setWindDirection(root.path("wind").path("deg").asInt());  // Wind direction (degrees)
-            weather.setPressure(root.path("main").path("pressure").asInt());  // Atmospheric pressure
+            weather.setTemperature(root.path("main").path("temp").asDouble()); // Temperature in Celsius
+            weather.setFeelsLike(root.path("main").path("feels_like").asDouble()); // "Feels like" temperature
+            weather.setHumidity(root.path("main").path("humidity").asDouble()); // Humidity in percentage
+            weather.setCondition(root.path("weather").get(0).path("description").asText()); // Weather description
+                                                                                            // (e.g., "clear sky")
+            weather.setWindSpeed(root.path("wind").path("speed").asDouble()); // Wind speed (m/s)
+            weather.setWindDirection(root.path("wind").path("deg").asInt()); // Wind direction (degrees)
+            weather.setPressure(root.path("main").path("pressure").asInt()); // Atmospheric pressure
 
             // Return the populated Weather object
             return weather;
@@ -69,7 +68,8 @@ public class WeatherService {
             // Log the error details if the weather data could not be fetched
             log.error("Failed to fetch weather data for lat={}, lon={}", latitude, longitude);
             // Throw a custom exception that can be handled globally
-            throw new WeatherNotFoundException("Failed to fetch weather data. Please check the API key or try again later.");
+            throw new WeatherNotFoundException(
+                    "Failed to fetch weather data. Please check the API key or try again later.");
         }
     }
 }
