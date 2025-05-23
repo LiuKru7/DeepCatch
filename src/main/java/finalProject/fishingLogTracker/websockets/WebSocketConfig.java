@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .addEndpoint("/ws")
                 .setHandshakeHandler(new CustomHandshakeHandler())
                 .addInterceptors(new JwtHandshakeInterceptor(jwtService))
-                .setAllowedOriginPatterns("http://localhost:4200") // <-- NE .setAllowedOrigins("*")
+                .setAllowedOriginPatterns("http://localhost:4200", "https://deepcatch.eu") // <-- NE .setAllowedOrigins("*")
                 .withSockJS();
     }
 
