@@ -30,7 +30,7 @@ public class FakeDataLoader implements CommandLineRunner {
                                 .role(Role.ROLE_ADMIN)
                                 .username("Slidra")
                                 .password(passwordEncoder.encode("Slidra#312"))
-                                .photoUrl("profile.png")
+                                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/f7714108-44ce-455e-88df-5270c21ae763_profile.jpg")
                                 .build();
 
                 userRepository.save(user);
@@ -41,7 +41,7 @@ public class FakeDataLoader implements CommandLineRunner {
                                 .email("admin@slidra.lt")
                                 .role(Role.ROLE_ADMIN)
                                 .username("admin")
-                                .photoUrl("profile.png")
+                                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/f7714108-44ce-455e-88df-5270c21ae763_profile.jpg")
                                 .password(passwordEncoder.encode("Admin132#"))
                                 .build();
 
@@ -53,7 +53,7 @@ public class FakeDataLoader implements CommandLineRunner {
                                 .email("user@Slidra.lt")
                                 .role(Role.ROLE_USER)
                                 .username("user")
-                                .photoUrl("profile.png")
+                                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/f7714108-44ce-455e-88df-5270c21ae763_profile.jpg")
                                 .password(passwordEncoder.encode("user"))
                                 .build();
 
@@ -65,7 +65,7 @@ public class FakeDataLoader implements CommandLineRunner {
                                 .email("user@user1.lt")
                                 .role(Role.ROLE_USER)
                                 .username("Liudvikas")
-                                .photoUrl("liu.png")
+                                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/f7714108-44ce-455e-88df-5270c21ae763_profile.jpg")
                                 .password(passwordEncoder.encode("user"))
                                 .build();
 
@@ -77,7 +77,7 @@ public class FakeDataLoader implements CommandLineRunner {
                                 .email("user@user2.lt")
                                 .role(Role.ROLE_USER)
                                 .username("Mindaugas")
-                                .photoUrl("min.png")
+                                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/f7714108-44ce-455e-88df-5270c21ae763_profile.jpg")
                                 .password(passwordEncoder.encode("user"))
                                 .build();
 

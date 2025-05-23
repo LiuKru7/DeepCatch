@@ -59,7 +59,7 @@ public class AuthenticationService {
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.ROLE_USER)
-                .photoUrl("profile.png")
+                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/f7714108-44ce-455e-88df-5270c21ae763_profile.jpg")
                 .build();
 
         repository.save(user);

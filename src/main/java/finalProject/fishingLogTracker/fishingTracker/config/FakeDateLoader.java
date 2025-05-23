@@ -186,7 +186,7 @@ public class FakeDateLoader implements CommandLineRunner {
                 .time(new Timestamp(System.currentTimeMillis()).toLocalDateTime())
                 .isReleased(true)
                 .weight(5.0)
-                .photoUrl("pike.png")
+                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/d6619e8c-3992-4a2c-8487-1cf24af1df56_lasisa.jpg")
                 .build();
         fish.setBait(baits.get(0));
         fish.setAquatic(aquaticList.get(0));
@@ -210,7 +210,7 @@ public class FakeDateLoader implements CommandLineRunner {
                 .time(new Timestamp(System.currentTimeMillis()).toLocalDateTime())
                 .isReleased(true)
                 .weight(12.0)
-                .photoUrl("lasisa.png")
+                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/d6619e8c-3992-4a2c-8487-1cf24af1df56_lasisa.jpg")
                 .bait(baits.get(1))
                 .species(speciesList.get(1))
                 .aquatic(aquaticList.get(1))
@@ -234,7 +234,7 @@ public class FakeDateLoader implements CommandLineRunner {
                 .time(new Timestamp(System.currentTimeMillis()).toLocalDateTime())
                 .isReleased(true)
                 .weight(17.0)
-                .photoUrl("lasisa.png")
+                .photoUrl("https://liudvikas-image-storage.s3.eu-north-1.amazonaws.com/d0e0d1ce-cfca-450e-a431-598389e20b18_pike.jpg")
                 .bait(baits.get(1))
                 .species(speciesList.get(1))
                 .aquatic(aquaticList.get(1))
