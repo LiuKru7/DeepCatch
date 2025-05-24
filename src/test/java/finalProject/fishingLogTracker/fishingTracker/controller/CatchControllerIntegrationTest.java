@@ -20,7 +20,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -130,7 +129,7 @@ class CatchControllerIntegrationTest {
                 FishingStyle.SPINNING,
                 LocalDateTime.of(2024, 5, 19, 10, 30),
                 testBait.getId(),
-                null,
+                "some-valid-url.jpg",
                 false,
                 "Nice catch, big fight!",
                 testUser.getId(),
