@@ -2,7 +2,9 @@ package finalProject.fishingLogTracker.fishingTracker.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,17 +13,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ImageServiceTest {
 
     private ImageService imageService;
 
-    @TempDir
-    Path tempDir;
+    @Mock
+    private S3Service s3Service;
 
     @BeforeEach
     void setUp() {
-        imageService = new ImageService();
+        imageService = new ImageService(s3Service);
     }
 
     @Test
@@ -35,13 +40,15 @@ class ImageServiceTest {
                 "image/jpeg",
                 content);
 
+        String expectedKey = "test-key.jpg";
+        when(s3Service.uploadFile(any(MultipartFile.class))).thenReturn(expectedKey);
+
         // Act
         String result = imageService.saveFile(file);
 
         // Assert
         assertNotNull(result);
-        assertTrue(result.endsWith(originalFilename));
-        assertTrue(Files.exists(Path.of("uploads", result)));
+        assertTrue(result.contains(expectedKey));
     }
 
     @Test
@@ -53,13 +60,15 @@ class ImageServiceTest {
                 "image/jpeg",
                 new byte[0]);
 
+        String expectedKey = "empty-file-key.jpg";
+        when(s3Service.uploadFile(any(MultipartFile.class))).thenReturn(expectedKey);
+
         // Act
         String result = imageService.saveFile(file);
 
         // Assert
         assertNotNull(result);
-        assertTrue(result.endsWith("test.jpg"));
-        assertTrue(Files.exists(Path.of("uploads", result)));
+        assertTrue(result.contains(expectedKey));
     }
 
     @Test

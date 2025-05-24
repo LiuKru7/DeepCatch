@@ -6,7 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-
 @Service
 public class ImageService {
 
@@ -23,6 +22,9 @@ public class ImageService {
     }
 
     public String saveFile(MultipartFile file) {
+        if (file == null) {
+            throw new RuntimeException("File cannot be null");
+        }
         try {
             String key = s3Service.uploadFile(file);
             return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + key;
@@ -32,4 +34,3 @@ public class ImageService {
         }
     }
 }
-
