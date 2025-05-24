@@ -63,12 +63,10 @@ public record CatchRequest(
         @NotNull(message = "Country is required")
         @NotBlank(message = "Country cannot be empty")
         @Size(min = 2, max = 100, message = "Country must be between 2 and 100 characters")
-        @Pattern(regexp = "^[a-zA-Z\\s-]+$", message = "Country can only contain letters, spaces, and hyphens")
         String country,
 
         @NotNull(message = "District is required")
         @NotBlank(message = "District cannot be empty")
         @Size(min = 2, max = 100, message = "District must be between 2 and 100 characters")
-        @Pattern(regexp = "^[a-zA-Z\\s-]+$", message = "District can only contain letters, spaces, and hyphens")
         String district) {
 }

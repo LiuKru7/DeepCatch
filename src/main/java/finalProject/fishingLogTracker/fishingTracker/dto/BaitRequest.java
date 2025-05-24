@@ -13,6 +13,5 @@ public record BaitRequest(
         BaitType baitType,
 
         @NotBlank(message = "Description must not be blank")
-        @Pattern(regexp = "^[a-zA-Z0-9\\s.,!?-]+$", message = "Description can only contain letters, numbers, spaces, and basic punctuation")
         String description) {
 }
