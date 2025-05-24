@@ -50,7 +50,6 @@ public class FileAccessController {
                     ? MediaType.parseMediaType(contentType)
                     : MediaType.APPLICATION_OCTET_STREAM;
 
-            // Validate image files
             if (mediaType.getType().equals("image")) {
                 try {
                     BufferedImage image = ImageIO.read(resource.getInputStream());
