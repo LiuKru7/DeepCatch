@@ -38,7 +38,7 @@ public class CatchController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CatchResponse> addCatchWithPhoto(
             @AuthenticationPrincipal final User user,
-            @RequestPart("catch") final CatchRequest catchRequest,
+            @RequestPart("catch")  @Valid final CatchRequest catchRequest,
             @RequestPart("file") final MultipartFile file) {
 
         log.info("Received request to add catch with photo for user ID: {}", user.getId());

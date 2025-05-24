@@ -36,7 +36,6 @@ public record CatchRequest(
         Long baitId,
 
         @NotNull(message = "Photo URL is required")
-        @Pattern(regexp = "^(https?|ftp)://[^\\s/$.?#].[^\\s]*$", message = "Invalid photo URL format")
         String photoUrl,
 
         @NotNull(message = "Is released is required")
@@ -51,13 +50,9 @@ public record CatchRequest(
         Long userId,
 
         @NotNull(message = "Latitude is required")
-        @DecimalMin(value = "-90.0", message = "Latitude must be at least -90")
-        @DecimalMax(value = "90.0", message = "Latitude must be at most 90")
         Double latitude,
 
         @NotNull(message = "Longitude is required")
-        @DecimalMin(value = "-180.0", message = "Longitude must be at least -180")
-        @DecimalMax(value = "180.0", message = "Longitude must be at most 180")
         Double longitude,
 
         @NotNull(message = "Country is required")
