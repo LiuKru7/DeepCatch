@@ -177,7 +177,7 @@ class AquaticControllerIntegrationTest {
                 .content(invalidJson))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.name").value("Name must not be blank"))
-                .andExpect(jsonPath("$.aquaticType").value("Aquatic type must not be null"));
+                .andExpect(jsonPath("$.aquaticType").value("Aquatic type cannot be null"));
     }
 
     @Test
