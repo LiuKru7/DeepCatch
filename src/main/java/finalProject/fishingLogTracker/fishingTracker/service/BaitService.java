@@ -24,7 +24,6 @@ public class BaitService {
     private final BaitRepository baitRepository;
     private final BaitMapper baitMapper;
 
-
     @Cacheable("baits")
     public List<BaitResponse> getAllBaits() {
         return baitRepository.findAll().stream()
@@ -34,7 +33,9 @@ public class BaitService {
 
     @CacheEvict(value = "baits", allEntries = true)
     public BaitResponse addNewBait(BaitRequest baitRequest) {
+        log.info("Adding new bait: {}", baitRequest);
         var bait = baitRepository.save(baitMapper.toBait(baitRequest));
+        log.info("Successfully added new bait with ID: {}", bait.getId());
         return baitMapper.toBaitResponse(bait);
     }
 
@@ -46,7 +47,7 @@ public class BaitService {
         Bait updatedBait = baitMapper.toBait(baitRequest);
         updatedBait.setId(existingBait.getId());
         Bait saved = baitRepository.save(updatedBait);
-
+        log.info("Successfully updated bait with ID: {}", id);
         return baitMapper.toBaitResponse(saved);
     }
 
@@ -55,9 +56,11 @@ public class BaitService {
         log.info("Deleting Bait with ID: {}", id);
 
         if (!baitRepository.existsById(id)) {
+            log.warn("Attempted to delete non-existent bait with ID: {}", id);
             throw new BaitNotFoundException("Bait not found with id: " + id);
         }
 
         baitRepository.deleteById(id);
+        log.info("Successfully deleted bait with ID: {}", id);
     }
 }

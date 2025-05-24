@@ -24,7 +24,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static finalProject.fishingLogTracker.auth.enums.Role.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
