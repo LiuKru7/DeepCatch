@@ -1,7 +1,7 @@
 package finalProject.fishingLogTracker.fishingTracker.entity;
 
 import finalProject.fishingLogTracker.auth.model.User;
-import finalProject.fishingLogTracker.fishingTracker.enums.FriendshipStatus;
+import finalProject.fishingLogTracker.fishingTracker.enums.InvitationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,24 +12,27 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class Friendship {
+public class GroupInvitation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private User sender;
+    private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
-    private User receiver;
+    private User invitedUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User invitedBy;
 
     @Enumerated(EnumType.STRING)
-    private FriendshipStatus status;
-    private LocalDateTime createdAt;
+    private InvitationStatus status;
+
+    private LocalDateTime invitedAt;
 }
+

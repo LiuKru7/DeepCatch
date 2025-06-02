@@ -33,7 +33,7 @@ public class MessageController {
      */
     @MessageMapping("/groupChat")
     @SendTo("/topic/group/messages")
-    public ChatMessage sendMessageToGroup(ChatMessage message, Principal principal) {
+    public ChatMessage sendMessageToGroup(final ChatMessage message,final Principal principal) {
         message.setSender(principal.getName());
         log.info("Group message from {}: {}", principal.getName(), message.getContent());
         return messageService.save(message);
@@ -46,7 +46,7 @@ public class MessageController {
      * @param principal the authenticated user
      */
     @MessageMapping("/chat")
-    public void sendMessage(ChatMessage message, Principal principal) {
+    public void sendMessage(final ChatMessage message,final Principal principal) {
         message.setSender(principal.getName());
         log.info("Private message from {} to {}: {}", principal.getName(), message.getReceiver(), message.getContent());
         messageService.save(message);
@@ -66,8 +66,8 @@ public class MessageController {
      */
     @GetMapping("api/messages/{friendUsername}")
     public List<ChatMessage> getConversation(
-            @AuthenticationPrincipal User user,
-            @PathVariable String friendUsername) {
+            @AuthenticationPrincipal final User user,
+            @PathVariable final String friendUsername) {
         log.info("User {} is retrieving conversation with {}", user.getUsername(), friendUsername);
         return messageService.getConversation(user.getUsername(), friendUsername);
     }
