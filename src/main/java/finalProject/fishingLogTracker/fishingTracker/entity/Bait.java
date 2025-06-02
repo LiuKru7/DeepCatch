@@ -23,8 +23,7 @@ public class Bait {
     private BaitType baitType;
     private String description;
 
-    @OneToMany(mappedBy = "bait")
-    @JsonBackReference
+    @OneToMany(mappedBy = "bait", fetch = FetchType.LAZY)
     private List<Catch> catches = new ArrayList<>();
 
     public Bait(BaitType baitType, String description) {

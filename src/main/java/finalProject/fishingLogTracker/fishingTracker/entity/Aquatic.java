@@ -20,13 +20,12 @@ public class Aquatic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
     @Enumerated(EnumType.STRING)
     private AquaticType aquaticType;
 
-    @OneToMany(mappedBy = "aquatic")
-    @JsonBackReference
+    @OneToMany(mappedBy = "aquatic", fetch = FetchType.LAZY)
     private List<Catch> catches = new ArrayList<>();
-
 
     public Aquatic(String name, AquaticType aquaticType) {
         this.name = name;
