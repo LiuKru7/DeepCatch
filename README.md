@@ -1,3 +1,5 @@
+# http://www.deepcatch.eu
+
 # Fishing Log Tracker Backend
 
 A robust Spring Boot backend service for tracking fishing activities, built with Spring Boot 3.2.3.

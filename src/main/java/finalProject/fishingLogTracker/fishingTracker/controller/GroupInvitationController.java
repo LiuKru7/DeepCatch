@@ -39,7 +39,4 @@ public class GroupInvitationController {
         GroupInvitationResponse response = groupInvitationService.processInvitationDecision(user.getId(), request);
         return ResponseEntity.ok(response);
     }
-
-
-
 }
