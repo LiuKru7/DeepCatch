@@ -24,20 +24,7 @@ public class MessageController {
     private final MessageService messageService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    /**
-     * Handles a group chat message sent via WebSocket.
-     *
-     * @param message   the chat message
-     * @param principal the authenticated user
-     * @return the saved chat message to be broadcast to the group
-     */
-    @MessageMapping("/groupChat")
-    @SendTo("/topic/group/messages")
-    public ChatMessage sendMessageToGroup(final ChatMessage message,final Principal principal) {
-        message.setSender(principal.getName());
-        log.info("Group message from {}: {}", principal.getName(), message.getContent());
-        return messageService.save(message);
-    }
+
 
     /**
      * Handles a private chat message sent via WebSocket and forwards it to the receiver.

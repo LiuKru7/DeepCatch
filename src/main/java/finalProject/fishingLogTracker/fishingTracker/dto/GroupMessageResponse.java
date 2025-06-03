@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record GroupMessageResponse(
     Long id,
-    String senderUsername,
+    String sender,
     String content,
     LocalDateTime sentAt
 ) {}
